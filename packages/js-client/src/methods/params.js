@@ -1,4 +1,4 @@
-import { camelCase } from 'lodash-es'
+import { camelCase } from 'scule'
 
 export const getRequestParams = function (params, requestParams, name) {
   const entries = Object.values(params).map((param) => getRequestParam(param, requestParams, name))
