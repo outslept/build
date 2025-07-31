@@ -5,7 +5,7 @@ import { env } from 'process'
 import { fileURLToPath } from 'url'
 
 import { default as build, startDev } from '@netlify/build'
-import test from 'ava'
+import { expect } from 'vitest'
 import cpy from 'cpy'
 import { execa, execaCommand } from 'execa'
 import stringify from 'fast-safe-stringify'
@@ -108,7 +108,8 @@ export class Fixture {
     relativeFixturePath?: string,
   ) {
     if (relativeFixturePath && relativeFixturePath.length !== 0) {
-      const testFile = fileURLToPath(test.meta.file)
+      const testState = expect.getState()
+      const testFile = testState.testPath || ''
       this.repositoryRoot = normalize(`${testFile}/../${relativeFixturePath}`)
 
       if (!existsSync(this.repositoryRoot)) {
