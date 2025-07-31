@@ -1,76 +1,76 @@
 import { Fixture, normalizeOutput } from '@netlify/testing'
-import test from 'ava'
+import { test, expect } from 'vitest'
 
-test('Context with context CLI flag', async (t) => {
+test('Context with context CLI flag', async () => {
   const output = await new Fixture('./fixtures/context_flag').withFlags({ context: 'testContext' }).runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Context environment variable', async (t) => {
+test('Context environment variable', async () => {
   const output = await new Fixture('./fixtures/context_flag').withEnv({ CONTEXT: 'testContext' }).runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Context default value', async (t) => {
+test('Context default value', async () => {
   const output = await new Fixture('./fixtures/context_default').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Context with branch CLI flag', async (t) => {
+test('Context with branch CLI flag', async () => {
   const output = await new Fixture('./fixtures/branch').withFlags({ branch: 'testBranch' }).runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Context with branch environment variable', async (t) => {
+test('Context with branch environment variable', async () => {
   const output = await new Fixture('./fixtures/branch')
     .withFlags({ branch: '' })
     .withEnv({ BRANCH: 'testBranch' })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Context with branch git', async (t) => {
+test('Context with branch git', async () => {
   const output = await new Fixture('./fixtures/branch')
     .withFlags({ branch: '' })
     .withCopyRoot({ branch: 'testBranch' })
     .then((fixture) => fixture.runWithConfig())
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Context with branch fallback', async (t) => {
+test('Context with branch fallback', async () => {
   const output = await new Fixture('./fixtures/branch_fallback')
     .withFlags({ branch: '' })
     .withCopyRoot({ git: false })
     .then((fixture) => fixture.runWithConfig())
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Context deep merge', async (t) => {
+test('Context deep merge', async () => {
   const output = await new Fixture('./fixtures/deep_merge').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Context array merge', async (t) => {
+test('Context array merge', async () => {
   const output = await new Fixture('./fixtures/array_merge').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Context merge priority', async (t) => {
+test('Context merge priority', async () => {
   const output = await new Fixture('./fixtures/priority_merge').withFlags({ branch: 'testBranch' }).runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Using context does not reset plugins', async (t) => {
+test('Using context does not reset plugins', async () => {
   const output = await new Fixture('./fixtures/context_reset').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Can use context properties for build.edge_functions', async (t) => {
+test('Can use context properties for build.edge_functions', async () => {
   const output = await new Fixture('./fixtures/context_edge_functions_build').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Can use context properties for edge_functions', async (t) => {
+test('Can use context properties for edge_functions', async () => {
   const output = await new Fixture('./fixtures/context_edge_functions_top').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
