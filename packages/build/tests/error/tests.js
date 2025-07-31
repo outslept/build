@@ -1,98 +1,98 @@
 import { Fixture, normalizeOutput } from '@netlify/testing'
-import test from 'ava'
+import { test, expect } from 'vitest'
 
 import { buildErrorToTracingAttributes } from '../../lib/error/types.js'
 
-test('exception', async (t) => {
+test('exception', async () => {
   const output = await new Fixture('./fixtures/exception').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('exception with static properties', async (t) => {
+test('exception with static properties', async () => {
   const output = await new Fixture('./fixtures/exception_props').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('exception with circular references', async (t) => {
+test('exception with circular references', async () => {
   const output = await new Fixture('./fixtures/exception_circular').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('exception that are strings', async (t) => {
+test('exception that are strings', async () => {
   const output = await new Fixture('./fixtures/exception_string').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('exception that are arrays', async (t) => {
+test('exception that are arrays', async () => {
   const output = await new Fixture('./fixtures/exception_array').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Do not log secret values on build errors', async (t) => {
+test('Do not log secret values on build errors', async () => {
   const output = await new Fixture('./fixtures/log_secret').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('TOML parsing errors', async (t) => {
+test('TOML parsing errors', async () => {
   const output = await new Fixture('./fixtures/toml_parsing').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Invalid error instances', async (t) => {
+test('Invalid error instances', async () => {
   const output = await new Fixture('./fixtures/invalid_instance').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Top-level errors', async (t) => {
+test('Top-level errors', async () => {
   const output = await new Fixture('./fixtures/top').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Top function errors local', async (t) => {
+test('Top function errors local', async () => {
   const output = await new Fixture('./fixtures/function').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Node module all fields', async (t) => {
+test('Node module all fields', async () => {
   const output = await new Fixture('./fixtures/full').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Node module partial fields', async (t) => {
+test('Node module partial fields', async () => {
   const output = await new Fixture('./fixtures/partial').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('No repository root', async (t) => {
+test('No repository root', async () => {
   const output = await new Fixture('./fixtures/no_root')
     .withCopyRoot({ git: false })
     .then((fixture) => fixture.runWithBuild())
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Process warnings', async (t) => {
+test('Process warnings', async () => {
   const output = await new Fixture('./fixtures/warning').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Uncaught exception', async (t) => {
+test('Uncaught exception', async () => {
   const output = await new Fixture('./fixtures/uncaught').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Unhandled promises', async (t) => {
+test('Unhandled promises', async () => {
   const output = await new Fixture('./fixtures/unhandled_promise').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Exits in plugins', async (t) => {
+test('Exits in plugins', async () => {
   const output = await new Fixture('./fixtures/plugin_exit').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Plugin errors can have a toJSON() method', async (t) => {
+test('Plugin errors can have a toJSON() method', async () => {
   const output = await new Fixture('./fixtures/plugin_error_to_json').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
 // Process exit is different on Windows
@@ -100,17 +100,17 @@ test('Plugin errors can have a toJSON() method', async (t) => {
 // @todo: uncomment after upgrading to Ava v4.
 // See https://github.com/netlify/build/issues/3615
 // if (platform !== 'win32') {
-//   test.skip('Early exit', async (t) => {
+//   test.skip('Early exit', async () => {
 //     const output = await new Fixture('./fixtures/early_exit').runWithBuild()
-//     t.snapshot(normalizeOutput(output))
+//     expect(normalizeOutput(output)).toMatchSnapshot()
 //   })
 // }
 
-test('Redact API token on errors', async (t) => {
+test('Redact API token on errors', async () => {
   const output = await new Fixture('./fixtures/api_token_redact')
     .withFlags({ token: '0123456789abcdef', deployId: 'test', mode: 'buildbot', testOpts: { host: '...' } })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
 const testMatrixAttributeTracing = [
@@ -248,20 +248,20 @@ const testMatrixAttributeTracing = [
 ]
 
 testMatrixAttributeTracing.forEach(({ description, input, expects }) => {
-  test(`Tracing attributes - ${description}`, async (t) => {
+  test(`Tracing attributes - ${description}`, async () => {
     const attributes = buildErrorToTracingAttributes(input)
-    t.deepEqual(attributes, expects)
+    expect(attributes).toEqual(expects)
   })
 })
 
-test('Trusted plugins - internal errors are system errors', async (t) => {
+test('Trusted plugins - internal errors are system errors', async () => {
   const fixture = new Fixture('./fixtures/trusted_plugin_uncaught')
   const { severityCode } = await fixture.runBuildProgrammatic()
-  t.deepEqual(severityCode, 4)
+  expect(severityCode).toBe(4)
 })
 
-test('Trusted plugins - controlled failures are user errors', async (t) => {
+test('Trusted plugins - controlled failures are user errors', async () => {
   const fixture = new Fixture('./fixtures/trusted_plugin')
   const { severityCode } = await fixture.runBuildProgrammatic()
-  t.deepEqual(severityCode, 2)
+  expect(severityCode).toBe(2)
 })

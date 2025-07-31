@@ -26,12 +26,11 @@
     "postbuild": "npx cpy \"src/**/*.yml\" \"lib/\"",
     "build": "tsc",
     "test:types": "tsd",
-    "test": "ava && tsd && vitest run",
-    "test:dev": "ava -w",
-    "test:ci": "run-p test:ci:*",
+    "test": "tsd && vitest run",
+    "test:dev": "vitest",
+    "test:ci": "run-s test:ci:*",
     "test:ci:types": "tsd",
-    "test:ci:ava": "c8 -r lcovonly -r text -r json ava",
-    "test:ci:vitest": "vitest run"
+    "test:ci:vitest": "vitest run --reporter=default"
   },
   "keywords": [
     "nodejs",
@@ -124,8 +123,6 @@
     "@opentelemetry/sdk-trace-base": "~1.24.0",
     "@types/node": "^18.19.111",
     "atob": "^2.1.2",
-    "ava": "^5.0.0",
-    "c8": "^10.0.0",
     "cpy": "^11.0.0",
     "cpy-cli": "^5.0.0",
     "get-node": "^14.2.1",

@@ -1,5 +1,5 @@
 import { Fixture, normalizeOutput } from '@netlify/testing'
-import test from 'ava'
+import { test, expect } from 'vitest'
 
 const STATUS_PATH = '/api/v1/deploys/test/plugin_runs'
 
@@ -26,382 +26,382 @@ const comparePackage = function ({ body: { package: packageA } }, { body: { pack
   return packageA < packageB ? -1 : 1
 }
 
-test('utils.status.show() can override a success status', async (t) => {
+test('utils.status.show() can override a success status', async () => {
   const { requests, output } = await new Fixture('./fixtures/success_status_override')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() cannot override an error status with a success status', async (t) => {
+test('utils.status.show() cannot override an error status with a success status', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_status_override')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() plugin error cannot override a build error', async (t) => {
+test('utils.status.show() plugin error cannot override a build error', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_status_error_override')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() implicit status is not used when an explicit call was made', async (t) => {
+test('utils.status.show() implicit status is not used when an explicit call was made', async () => {
   const { requests, output } = await new Fixture('./fixtures/no_implicit')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() implicit status is not used when there are no events', async (t) => {
+test('utils.status.show() implicit status is not used when there are no events', async () => {
   const { requests, output } = await new Fixture('./fixtures/no_implicit_none')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() implicit status is not used when plugin did not complete', async (t) => {
+test('utils.status.show() implicit status is not used when plugin did not complete', async () => {
   const { requests, output } = await new Fixture('./fixtures/no_implicit_incomplete')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() implicit status is not used when no call was made, with only onError', async (t) => {
+test('utils.status.show() implicit status is not used when no call was made, with only onError', async () => {
   const { requests, output } = await new Fixture('./fixtures/no_implicit_onerror')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() implicit status is used when no call was made', async (t) => {
+test('utils.status.show() implicit status is used when no call was made', async () => {
   const { requests, output } = await new Fixture('./fixtures/implicit_one')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() implicit status is used when no events have made a call', async (t) => {
+test('utils.status.show() implicit status is used when no events have made a call', async () => {
   const { requests, output } = await new Fixture('./fixtures/implicit_several')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() implicit status is used when no call was made, with only onEnd', async (t) => {
+test('utils.status.show() implicit status is used when no call was made, with only onEnd', async () => {
   const { requests, output } = await new Fixture('./fixtures/implicit_onend')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() are printed locally', async (t) => {
+test('utils.status.show() are printed locally', async () => {
   const output = await new Fixture('./fixtures/print').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() are not printed in production', async (t) => {
+test('utils.status.show() are not printed in production', async () => {
   const output = await new Fixture('./fixtures/print').withFlags({ mode: 'buildbot' }).runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() statuses are sent to the API', async (t) => {
+test('utils.status.show() statuses are sent to the API', async () => {
   const { requests, output } = await new Fixture('./fixtures/print')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() statuses are not sent to the API without a token', async (t) => {
+test('utils.status.show() statuses are not sent to the API without a token', async () => {
   const { requests, output } = await new Fixture('./fixtures/print')
     .withFlags({ deployId: 'test', token: '', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() statuses are not sent to the API without a DEPLOY_ID', async (t) => {
+test('utils.status.show() statuses are not sent to the API without a DEPLOY_ID', async () => {
   const { requests, output } = await new Fixture('./fixtures/print')
     .withFlags({ deployId: '', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() statuses are sent to the API for core commands', async (t) => {
+test('utils.status.show() statuses are sent to the API for core commands', async () => {
   const { requests, output } = await new Fixture('./fixtures/core_command_error')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() statuses API errors are handled', async (t) => {
+test('utils.status.show() statuses API errors are handled', async () => {
   const { requests, output } = await new Fixture('./fixtures/simple')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH, status: 400 })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() statuses are sent to the API without colors', async (t) => {
+test('utils.status.show() statuses are sent to the API without colors', async () => {
   const { requests, output } = await new Fixture('./fixtures/colors')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('report error statuses from failBuild()', async (t) => {
+test('report error statuses from failBuild()', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_fail_build')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('report error statuses from failPlugin()', async (t) => {
+test('report error statuses from failPlugin()', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_fail_plugin')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('report error statuses from cancelBuild()', async (t) => {
+test('report error statuses from cancelBuild()', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_cancel_build')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('does not report error statuses from build.command errors', async (t) => {
+test('does not report error statuses from build.command errors', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_build_command')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('report error statuses from uncaught exceptions with static properties', async (t) => {
+test('report error statuses from uncaught exceptions with static properties', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_properties')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('report error statuses from uncaught exceptions during plugin load', async (t) => {
+test('report error statuses from uncaught exceptions during plugin load', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_load_uncaught')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('report error statuses from uncaught exceptions during onSuccess', async (t) => {
+test('report error statuses from uncaught exceptions during onSuccess', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_onsuccess')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('report error statuses from uncaught exceptions during onEnd', async (t) => {
+test('report error statuses from uncaught exceptions during onEnd', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_onend')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('report error statuses from plugin invalid shape', async (t) => {
+test('report error statuses from plugin invalid shape', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_plugin_shape')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('report error statuses from plugin inputs validation', async (t) => {
+test('report error statuses from plugin inputs validation', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_inputs_validation')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('report error statuses from plugin loads with other plugins loading', async (t) => {
+test('report error statuses from plugin loads with other plugins loading', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_plugin_load')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('report error statuses extraData from failBuild()', async (t) => {
+test('report error statuses extraData from failBuild()', async () => {
   const { requests, output } = await new Fixture('./fixtures/error_extra_info')
     .withFlags({ deployId: 'test', token: 'test', sendStatus: true })
     .runBuildServer({ path: STATUS_PATH })
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
   const snapshots = requests.map(normalizeRequest).sort(comparePackage)
-  t.snapshot(snapshots)
+  expect(snapshots).toMatchSnapshot()
 })
 
-test('utils.status.show() does not fail', async (t) => {
+test('utils.status.show() does not fail', async () => {
   const output = await new Fixture('./fixtures/show_util')
     .withEnv({
       SHOW_ARG: JSON.stringify({ title: 'title', summary: 'summary', text: 'text' }),
     })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() argument should be defined', async (t) => {
+test('utils.status.show() argument should be defined', async () => {
   const output = await new Fixture('./fixtures/show_util').withEnv({ SHOW_ARG: JSON.stringify('') }).runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() argument should be an object', async (t) => {
+test('utils.status.show() argument should be an object', async () => {
   const output = await new Fixture('./fixtures/show_util')
     .withEnv({ SHOW_ARG: JSON.stringify('summary') })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() argument should not contain typos', async (t) => {
+test('utils.status.show() argument should not contain typos', async () => {
   const output = await new Fixture('./fixtures/show_util')
     .withEnv({
       SHOW_ARG: JSON.stringify({ titles: 'title', summary: 'summary', text: 'text' }),
     })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() requires a summary', async (t) => {
+test('utils.status.show() requires a summary', async () => {
   const output = await new Fixture('./fixtures/show_util')
     .withEnv({
       SHOW_ARG: JSON.stringify({ title: 'title', text: 'text' }),
     })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() allow other fields to be optional', async (t) => {
+test('utils.status.show() allow other fields to be optional', async () => {
   const output = await new Fixture('./fixtures/show_util')
     .withEnv({ SHOW_ARG: JSON.stringify({ summary: 'summary' }) })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() title should be a string', async (t) => {
+test('utils.status.show() title should be a string', async () => {
   const output = await new Fixture('./fixtures/show_util')
     .withEnv({
       SHOW_ARG: JSON.stringify({ title: true, summary: 'summary', text: 'text' }),
     })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() title can be empty', async (t) => {
+test('utils.status.show() title can be empty', async () => {
   const output = await new Fixture('./fixtures/show_util')
     .withEnv({
       SHOW_ARG: JSON.stringify({ title: ' ', summary: 'summary', text: 'text' }),
     })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() summary should be a string', async (t) => {
+test('utils.status.show() summary should be a string', async () => {
   const output = await new Fixture('./fixtures/show_util')
     .withEnv({
       SHOW_ARG: JSON.stringify({ title: 'title', summary: true, text: 'text' }),
     })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() summary should not be empty', async (t) => {
+test('utils.status.show() summary should not be empty', async () => {
   const output = await new Fixture('./fixtures/show_util')
     .withEnv({
       SHOW_ARG: JSON.stringify({ title: 'title', summary: ' ', text: 'text' }),
     })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() text should be a string', async (t) => {
+test('utils.status.show() text should be a string', async () => {
   const output = await new Fixture('./fixtures/show_util')
     .withEnv({
       SHOW_ARG: JSON.stringify({ title: 'title', summary: 'summary', text: true }),
     })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() text can be empty', async (t) => {
+test('utils.status.show() text can be empty', async () => {
   const output = await new Fixture('./fixtures/show_util')
     .withEnv({
       SHOW_ARG: JSON.stringify({ title: 'title', summary: 'summary', text: ' ' }),
     })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() extraData can be empty', async (t) => {
+test('utils.status.show() extraData can be empty', async () => {
   const output = await new Fixture('./fixtures/show_util')
     .withEnv({
       SHOW_ARG: JSON.stringify({ title: 'title', summary: 'summary', text: ' ', extraData: [] }),
     })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('utils.status.show() extraData should be an array', async (t) => {
+test('utils.status.show() extraData should be an array', async () => {
   const output = await new Fixture('./fixtures/show_util')
     .withEnv({
       SHOW_ARG: JSON.stringify({ title: 'title', summary: 'summary', text: ' ', extraData: '' }),
     })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })

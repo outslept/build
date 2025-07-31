@@ -1,9 +1,9 @@
-import test from 'ava'
+import { test, expect } from 'vitest'
 
 import { validateEdgeFunctionsManifest } from '../../../lib/plugins_core/edge_functions/validate_manifest/validate_edge_functions_manifest.js'
 import { removeErrorColors } from '../../../src/error/colors.js'
 
-test('should validate valid manifest', async (t) => {
+test('should validate valid manifest', async () => {
   const manifest = {
     bundles: [
       {
@@ -28,23 +28,33 @@ test('should validate valid manifest', async (t) => {
     bundler_version: '1.6.0',
   }
 
-  await t.notThrowsAsync(validateEdgeFunctionsManifest(manifest))
+  await expect(validateEdgeFunctionsManifest(manifest)).resolves.not.toThrow()
 })
 
-test('should print error on invalid manifest', async (t) => {
+test('should print error on invalid manifest', async () => {
   const manifest = 'json'
 
-  const error = await t.throwsAsync(validateEdgeFunctionsManifest(manifest))
+  let error
+  try {
+    await validateEdgeFunctionsManifest(manifest)
+  } catch (e) {
+    error = e
+  }
 
+  expect(error).toBeDefined()
   removeErrorColors(error)
-
-  t.snapshot(error.message)
+  expect(error.message).toMatchSnapshot()
 })
 
-test('should print error on empty manifest', async (t) => {
-  const error = await t.throwsAsync(validateEdgeFunctionsManifest({}))
+test('should print error on empty manifest', async () => {
+  let error
+  try {
+    await validateEdgeFunctionsManifest({})
+  } catch (e) {
+    error = e
+  }
 
+  expect(error).toBeDefined()
   removeErrorColors(error)
-
-  t.snapshot(error.message)
+  expect(error.message).toMatchSnapshot()
 })

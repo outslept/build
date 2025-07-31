@@ -2,14 +2,14 @@ import { access } from 'node:fs/promises'
 import { join } from 'path'
 
 import { Fixture } from '@netlify/testing'
-import test from 'ava'
+import { test, expect } from 'vitest'
 
-test('Build removes blobs directory before starting', async (t) => {
+test('Build removes blobs directory before starting', async () => {
   const fixture = await new Fixture('./fixtures/with_preexisting_blobs').withCopyRoot({ git: false })
 
   const blobsDir = join(fixture.repositoryRoot, '.netlify', 'blobs', 'deploy')
 
-  await t.notThrowsAsync(access(blobsDir))
+  await expect(access(blobsDir)).resolves.not.toThrow()
 
   const { success } = await fixture
     .withFlags({
@@ -17,17 +17,17 @@ test('Build removes blobs directory before starting', async (t) => {
     })
     .runBuildProgrammatic()
 
-  t.true(success)
+  expect(success).toBe(true)
 
-  await t.throwsAsync(access(blobsDir))
+  await expect(access(blobsDir)).rejects.toThrow()
 })
 
-test('Build does not log if there is nothing to cleanup', async (t) => {
+test('Build does not log if there is nothing to cleanup', async () => {
   const fixture = await new Fixture('./fixtures/src_empty').withCopyRoot({ git: false })
 
   const blobsDir = join(fixture.repositoryRoot, '.netlify', 'blobs', 'deploy')
 
-  await t.throwsAsync(access(blobsDir))
+  await expect(access(blobsDir)).rejects.toThrow()
 
   const {
     success,
@@ -38,14 +38,14 @@ test('Build does not log if there is nothing to cleanup', async (t) => {
     })
     .runBuildProgrammatic()
 
-  t.true(success)
-  t.false(stdout.join('\n').includes('Cleaning up leftover files from previous builds'))
+  expect(success).toBe(true)
+  expect(stdout.join('\n').includes('Cleaning up leftover files from previous builds')).toBe(false)
 })
 
-test('monorepo > Build removes blobs directory before starting', async (t) => {
+test('monorepo > Build removes blobs directory before starting', async () => {
   const fixture = await new Fixture('./fixtures/monorepo').withCopyRoot({ git: false })
   const blobsDir = join(fixture.repositoryRoot, 'apps/app-1/.netlify/blobs/deploy')
-  await t.notThrowsAsync(access(blobsDir))
+  await expect(access(blobsDir)).resolves.not.toThrow()
 
   const { success } = await fixture
     .withFlags({
@@ -54,17 +54,17 @@ test('monorepo > Build removes blobs directory before starting', async (t) => {
     })
     .runBuildProgrammatic()
 
-  t.true(success)
+  expect(success).toBe(true)
 
-  await t.throwsAsync(access(blobsDir))
+  await expect(access(blobsDir)).rejects.toThrow()
 })
 
-test('monorepo > Build does not log if there is nothing to cleanup', async (t) => {
+test('monorepo > Build does not log if there is nothing to cleanup', async () => {
   const fixture = await new Fixture('./fixtures/monorepo').withCopyRoot({ git: false })
 
   const blobsDir = join(fixture.repositoryRoot, 'apps/app-2/.netlify/blobs/deploy')
 
-  await t.throwsAsync(access(blobsDir))
+  await expect(access(blobsDir)).rejects.toThrow()
 
   const {
     success,
@@ -76,6 +76,6 @@ test('monorepo > Build does not log if there is nothing to cleanup', async (t) =
     })
     .runBuildProgrammatic()
 
-  t.true(success)
-  t.false(stdout.join('\n').includes('Cleaning up leftover files from previous builds'))
+  expect(success).toBe(true)
+  expect(stdout.join('\n').includes('Cleaning up leftover files from previous builds')).toBe(false)
 })

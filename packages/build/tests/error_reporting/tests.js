@@ -2,12 +2,12 @@ import dns from 'dns'
 
 import { intercept, cleanAll } from '@netlify/nock-udp'
 import { Fixture } from '@netlify/testing'
-import test from 'ava'
 import { spyOn } from 'tinyspy'
+import { test, expect, beforeAll, afterAll } from 'vitest'
 
 let dnsLookupSpy
 
-test.before(() => {
+beforeAll(() => {
   const origLookup = dns.lookup
   // we have to stub dns lookup as hot-shots is caching dns and therefore calling dns.lookup directly
   dnsLookupSpy = spyOn(dns, 'lookup', (host, options, cb = options) => {
@@ -22,37 +22,38 @@ test.before(() => {
   })
 })
 
-test.after(() => {
+afterAll(() => {
   dnsLookupSpy.restore()
   cleanAll()
 })
 
-test('Does send tracking on edge functions bundling error', async (t) => {
-  t.snapshot(await getTrackingRequestsString(t, './fixtures/edge_functions'))
+test('Does send tracking on edge functions bundling error', async () => {
+  expect(await getTrackingRequestsString('./fixtures/edge_functions')).toMatchSnapshot()
 })
 
-test('Does send tracking on functions bundling error', async (t) => {
-  t.snapshot(await getTrackingRequestsString(t, './fixtures/functions_zisi'))
+test('Does send tracking on functions bundling error', async () => {
+  expect(await getTrackingRequestsString('./fixtures/functions_zisi')).toMatchSnapshot()
 })
 
-test('Does send tracking on internal plugin error', async (t) => {
-  t.snapshot(await getTrackingRequestsString(t, './fixtures/system_plugin'))
+test('Does send tracking on internal plugin error', async () => {
+  expect(await getTrackingRequestsString('./fixtures/system_plugin')).toMatchSnapshot()
 })
 
-test('Does send tracking on user plugin error', async (t) => {
-  await getTrackingRequestsString(t, './fixtures/user_plugin', false)
+test('Does send tracking on user plugin error', async () => {
+  await getTrackingRequestsString('./fixtures/user_plugin', false)
 })
 
 // Retrieve statsd packets sent to --statsd.host|port, and get their snapshot
-const getTrackingRequestsString = async function (t, fixtureName, used = true) {
-  const timerRequests = await getAllTrackingRequests(t, fixtureName, used)
+const getTrackingRequestsString = async function (fixtureName, used = true) {
+  const testTitle = expect.getState().currentTestName
+  const timerRequests = await getAllTrackingRequests(testTitle, fixtureName, used)
   const timerRequestsString = serializeTimerRequests(timerRequests)
   return timerRequestsString
 }
 
-const getAllTrackingRequests = async function (t, fixtureName, used) {
+const getAllTrackingRequests = async function (testTitle, fixtureName, used) {
   // Ensure there's no conflict between each test scope
-  const host = `errorreportingtest.${encodeURI(t.title)}`
+  const host = `errorreportingtest.${encodeURI(testTitle)}`
   const port = '1234'
   const scope = intercept(`${host}:${port}`, { persist: true, allowUnknown: true })
 
@@ -61,7 +62,7 @@ const getAllTrackingRequests = async function (t, fixtureName, used) {
   await new Fixture(fixtureName).withFlags({ statsd: { host, port } }).runWithBuild()
 
   const timerRequests = scope.buffers.flatMap(flattenRequest)
-  t.is(scope.used, used)
+  expect(scope.used).toBe(used)
   scope.clean()
   return timerRequests
 }
