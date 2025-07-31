@@ -560,6 +560,12 @@ Unterminated string at row 1, col 3, pos 2:
 "
 `;
 
+exports[`Configuration file - read permission error 1`] = `
+"When resolving config file packages/config/tests/parse/fixtures/read_error/netlify.toml:
+Could not read configuration file
+EISDIR: illegal operation on a directory, read"
+`;
+
 exports[`Configuration file - trailing backslashes in double quote strings in TOML should fail 1`] = `
 "When resolving config file packages/config/tests/parse/fixtures/parse_backslash_trailing_double/netlify.toml:
 In netlify.toml, the following backslash should be escaped: /
