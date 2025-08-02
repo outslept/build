@@ -1,75 +1,75 @@
 import { cwd } from 'process'
 
 import { Fixture, normalizeOutput } from '@netlify/testing'
-import test from 'ava'
+import { test, expect } from 'vitest'
 
 const getStackLinesCount = function (returnValue) {
   return returnValue.split('\n').filter((line) => line.trim().startsWith('at ')).length
 }
 
-test('Clean stack traces of build.command', async (t) => {
+test('Clean stack traces of build.command', async () => {
   const output = await new Fixture('./fixtures/build_command').withFlags({ debug: false }).runWithBuild()
-  t.is(getStackLinesCount(output), 0)
+  expect(getStackLinesCount(output)).toBe(0)
 })
 
-test('Clean stack traces of plugin event handlers', async (t) => {
+test('Clean stack traces of plugin event handlers', async () => {
   const output = await new Fixture('./fixtures/plugin').withFlags({ debug: false }).runWithBuild()
-  t.is(getStackLinesCount(output), 1)
+  expect(getStackLinesCount(output)).toBe(1)
 })
 
-test('Do not clean stack traces in debug mode', async (t) => {
+test('Do not clean stack traces in debug mode', async () => {
   const output = await new Fixture('./fixtures/plugin').withFlags({ debug: true }).runWithBuild()
-  t.not(getStackLinesCount(output), 1)
+  expect(getStackLinesCount(output)).not.toBe(1)
 })
 
-test('Does not clean stack traces of exceptions', async (t) => {
+test('Does not clean stack traces of exceptions', async () => {
   const output = await new Fixture('./fixtures/stack_exception').withFlags({ debug: false }).runWithBuild()
-  t.not(getStackLinesCount(output), 1)
+  expect(getStackLinesCount(output)).not.toBe(1)
 })
 
-test('Clean stack traces of config validation', async (t) => {
+test('Clean stack traces of config validation', async () => {
   const output = await new Fixture('./fixtures/config_validation').withFlags({ debug: false }).runWithBuild()
-  t.is(getStackLinesCount(output), 0)
+  expect(getStackLinesCount(output)).toBe(0)
 })
 
-test('Clean stack traces from cwd', async (t) => {
+test('Clean stack traces from cwd', async () => {
   const output = await new Fixture('./fixtures/plugin').withFlags({ debug: false }).runWithBuild()
-  t.false(output.includes(`onPreBuild (${cwd()}`))
+  expect(output.includes(`onPreBuild (${cwd()}`)).toBe(false)
 })
 
-test('Clean stack traces but keep error message', async (t) => {
+test('Clean stack traces but keep error message', async () => {
   const output = await new Fixture('./fixtures/plugin').withFlags({ debug: false }).runWithBuild()
-  t.true(output.includes('Error: test'))
+  expect(output.includes('Error: test')).toBe(true)
 })
 
-test('Print stack trace of plugin errors', async (t) => {
+test('Print stack trace of plugin errors', async () => {
   const output = await new Fixture('./fixtures/plugin_stack').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Print stack trace of plugin errors during load', async (t) => {
+test('Print stack trace of plugin errors during load', async () => {
   const output = await new Fixture('./fixtures/plugin_load').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Print stack trace of build.command errors', async (t) => {
+test('Print stack trace of build.command errors', async () => {
   const output = await new Fixture('./fixtures/command_stack').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Print stack trace of build.command errors with stack traces', async (t) => {
+test('Print stack trace of build.command errors with stack traces', async () => {
   const output = await new Fixture('./fixtures/command_full_stack').runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Print stack trace of Build command UI settings', async (t) => {
+test('Print stack trace of Build command UI settings', async () => {
   const output = await new Fixture('./fixtures/none')
     .withFlags({ defaultConfig: { build: { command: 'node --invalid' } } })
     .runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Print stack trace of validation errors', async (t) => {
+test('Print stack trace of validation errors', async () => {
   const output = await new Fixture().withFlags({ config: '/invalid' }).runWithBuild()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })

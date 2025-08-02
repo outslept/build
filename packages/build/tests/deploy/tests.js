@@ -2,21 +2,21 @@ import { normalize } from 'path'
 import { platform } from 'process'
 
 import { Fixture, normalizeOutput, startTcpServer } from '@netlify/testing'
-import test from 'ava'
+import { test, expect } from 'vitest'
 
-test('Deploy plugin succeeds', async (t) => {
+test('Deploy plugin succeeds', async () => {
   const { address, requests, stopServer } = await startDeployServer()
   try {
     const output = await new Fixture('./fixtures/empty').withFlags({ buildbotServerSocket: address }).runWithBuild()
-    t.snapshot(normalizeOutput(output))
+    expect(normalizeOutput(output)).toMatchSnapshot()
   } finally {
     await stopServer()
   }
 
-  t.true(requests.every(isValidDeployReponse))
+  expect(requests.every(isValidDeployReponse)).toBe(true)
 })
 
-test('Deploy plugin sends deployDir as a path relative to repositoryRoot', async (t) => {
+test('Deploy plugin sends deployDir as a path relative to repositoryRoot', async () => {
   const { address, requests, stopServer } = await startDeployServer()
   try {
     await new Fixture('./fixtures/dir_path').withFlags({ buildbotServerSocket: address }).runWithBuild()
@@ -25,10 +25,10 @@ test('Deploy plugin sends deployDir as a path relative to repositoryRoot', async
   }
 
   const [{ deployDir }] = requests
-  t.is(deployDir, normalize('base/publish'))
+  expect(deployDir).toBe(normalize('base/publish'))
 })
 
-test('Deploy plugin is not run unless --buildbotServerSocket is passed', async (t) => {
+test('Deploy plugin is not run unless --buildbotServerSocket is passed', async () => {
   const { requests, stopServer } = await startDeployServer()
   try {
     await new Fixture('./fixtures/empty').runWithBuild()
@@ -36,52 +36,52 @@ test('Deploy plugin is not run unless --buildbotServerSocket is passed', async (
     await stopServer()
   }
 
-  t.is(requests.length, 0)
+  expect(requests.length).toBe(0)
 })
 
-test('Deploy plugin connection error', async (t) => {
+test('Deploy plugin connection error', async () => {
   const { address, stopServer } = await startDeployServer()
   await stopServer()
   const output = await new Fixture('./fixtures/empty').withFlags({ buildbotServerSocket: address }).runWithBuild()
-  t.true(output.includes('Internal error during "Deploy site"'))
+  expect(output.includes('Internal error during "Deploy site"')).toBe(true)
 })
 
-test('Deploy plugin response syntax error', async (t) => {
+test('Deploy plugin response syntax error', async () => {
   const { address, stopServer } = await startDeployServer({ response: 'test' })
   try {
     const output = await new Fixture('./fixtures/empty').withFlags({ buildbotServerSocket: address }).runWithBuild()
     // This shape of this error can change with different Node.js versions.
-    t.true(output.includes('Internal error during "Deploy site"'))
+    expect(output.includes('Internal error during "Deploy site"')).toBe(true)
   } finally {
     await stopServer()
   }
 })
 
-test('Deploy plugin response system error', async (t) => {
+test('Deploy plugin response system error', async () => {
   const { address, stopServer } = await startDeployServer({
     response: { succeeded: false, values: { error: 'test', error_type: 'system' } },
   })
   try {
     const output = await new Fixture('./fixtures/empty').withFlags({ buildbotServerSocket: address }).runWithBuild()
-    t.snapshot(normalizeOutput(output))
+    expect(normalizeOutput(output)).toMatchSnapshot()
   } finally {
     await stopServer()
   }
 })
 
-test('Deploy plugin response user error', async (t) => {
+test('Deploy plugin response user error', async () => {
   const { address, stopServer } = await startDeployServer({
     response: { succeeded: false, values: { error: 'test', error_type: 'user' } },
   })
   try {
     const output = await new Fixture('./fixtures/empty').withFlags({ buildbotServerSocket: address }).runWithBuild()
-    t.snapshot(normalizeOutput(output))
+    expect(normalizeOutput(output)).toMatchSnapshot()
   } finally {
     await stopServer()
   }
 })
 
-test('Deploy plugin does not wait for post-processing if not using onSuccess nor onEnd', async (t) => {
+test('Deploy plugin does not wait for post-processing if not using onSuccess nor onEnd', async () => {
   const { address, requests, stopServer } = await startDeployServer()
   try {
     await new Fixture('./fixtures/empty').withFlags({ buildbotServerSocket: address }).runWithBuild()
@@ -89,10 +89,10 @@ test('Deploy plugin does not wait for post-processing if not using onSuccess nor
     await stopServer()
   }
 
-  t.true(requests.every(doesNotWaitForPostProcessing))
+  expect(requests.every(doesNotWaitForPostProcessing)).toBe(true)
 })
 
-test('Deploy plugin waits for post-processing if using onSuccess', async (t) => {
+test('Deploy plugin waits for post-processing if using onSuccess', async () => {
   const { address, requests, stopServer } = await startDeployServer()
   try {
     await new Fixture('./fixtures/success').withFlags({ buildbotServerSocket: address }).runWithBuild()
@@ -100,10 +100,10 @@ test('Deploy plugin waits for post-processing if using onSuccess', async (t) => 
     await stopServer()
   }
 
-  t.true(requests.every(waitsForPostProcessing))
+  expect(requests.every(waitsForPostProcessing)).toBe(true)
 })
 
-test('Deploy plugin waits for post-processing if using onEnd', async (t) => {
+test('Deploy plugin waits for post-processing if using onEnd', async () => {
   const { address, requests, stopServer } = await startDeployServer()
   try {
     await new Fixture('./fixtures/end').withFlags({ buildbotServerSocket: address }).runWithBuild()
@@ -111,10 +111,10 @@ test('Deploy plugin waits for post-processing if using onEnd', async (t) => {
     await stopServer()
   }
 
-  t.true(requests.every(waitsForPostProcessing))
+  expect(requests.every(waitsForPostProcessing)).toBe(true)
 })
 
-test('Deploy plugin returns an internal deploy error if the server responds with a 500', async (t) => {
+test('Deploy plugin returns an internal deploy error if the server responds with a 500', async () => {
   const { address, stopServer } = await startDeployServer({
     response: { succeeded: false, values: { error: 'test', error_type: 'user', code: '500' } },
   })
@@ -124,18 +124,18 @@ test('Deploy plugin returns an internal deploy error if the server responds with
       severityCode,
       logs: { stdout },
     } = await new Fixture('./fixtures/empty').withFlags({ buildbotServerSocket: address }).runBuildProgrammatic()
-    t.false(success)
+    expect(success).toBe(false)
     // system-error code
-    t.is(severityCode, 4)
+    expect(severityCode).toBe(4)
     const output = stdout.join('\n')
-    t.true(output.includes('Internal error deploying'))
-    t.true(output.includes('Deploy did not succeed with HTTP Error 500'))
+    expect(output.includes('Internal error deploying')).toBe(true)
+    expect(output.includes('Deploy did not succeed with HTTP Error 500')).toBe(true)
   } finally {
     await stopServer()
   }
 })
 
-test('Deploy plugin returns a  deploy error if the server responds with a 4xx', async (t) => {
+test('Deploy plugin returns a  deploy error if the server responds with a 4xx', async () => {
   const { address, stopServer } = await startDeployServer({
     response: { succeeded: false, values: { error: 'test', error_type: 'user', code: '401' } },
   })
@@ -145,12 +145,12 @@ test('Deploy plugin returns a  deploy error if the server responds with a 4xx', 
       severityCode,
       logs: { stdout },
     } = await new Fixture('./fixtures/empty').withFlags({ buildbotServerSocket: address }).runBuildProgrammatic()
-    t.false(success)
+    expect(success).toBe(false)
     // user-error code
-    t.is(severityCode, 2)
+    expect(severityCode).toBe(2)
     const output = stdout.join('\n')
-    t.true(output.includes('Error deploying'))
-    t.true(output.includes('Deploy did not succeed with HTTP Error 401'))
+    expect(output.includes('Error deploying')).toBe(true)
+    expect(output.includes('Deploy did not succeed with HTTP Error 401')).toBe(true)
   } finally {
     await stopServer()
   }

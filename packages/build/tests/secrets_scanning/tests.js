@@ -1,80 +1,84 @@
 import { Fixture, normalizeOutput } from '@netlify/testing'
-import test from 'ava'
+import { test, expect } from 'vitest'
 
-test('secrets scanning, should not run when disabled', async (t) => {
+test('secrets scanning, should not run when disabled', async () => {
   const output = await new Fixture('./fixtures/src_scanning_disabled').withFlags({ debug: false }).runWithBuild()
-  t.false(normalizeOutput(output).includes('Scanning for secrets in code and build output'))
+  expect(normalizeOutput(output).includes('Scanning for secrets in code and build output')).toBe(false)
 })
 
-test('secrets scanning, should skip with secrets but SECRETS_SCAN_ENABLED=false', async (t) => {
+test('secrets scanning, should skip with secrets but SECRETS_SCAN_ENABLED=false', async () => {
   const output = await new Fixture('./fixtures/src_scanning_disabled')
     .withFlags({ debug: false, explicitSecretKeys: 'ENV_VAR_1,ENV_VAR_2' })
     .runWithBuild()
-  t.true(normalizeOutput(output).includes('Secrets scanning disabled via SECRETS_SCAN_ENABLED flag set to false.'))
+  expect(
+    normalizeOutput(output).includes('Secrets scanning disabled via SECRETS_SCAN_ENABLED flag set to false.'),
+  ).toBe(true)
 })
 
-test('secrets scanning, should skip when secrets passed but no env vars set', async (t) => {
+test('secrets scanning, should skip when secrets passed but no env vars set', async () => {
   const output = await new Fixture('./fixtures/src_default')
     .withFlags({ debug: false, explicitSecretKeys: 'abc,DEF' })
     .runWithBuild()
-  t.true(
+  expect(
     normalizeOutput(output).includes(
       'Secrets scanning skipped because no env vars marked as secret are set to non-empty/non-trivial values or they are all omitted with SECRETS_SCAN_OMIT_KEYS env var setting.',
     ),
-  )
+  ).toBe(true)
 })
 
-test('secrets scanning, should skip when secrets passed but no non-empty/trivial env vars set', async (t) => {
+test('secrets scanning, should skip when secrets passed but no non-empty/trivial env vars set', async () => {
   const output = await new Fixture('./fixtures/src_scanning_env_vars_set_empty')
     .withFlags({
       debug: false,
       explicitSecretKeys: 'ENV_VAR_1,ENV_VAR_,2ENV_VAR_3,ENV_VAR_4,ENV_VAR_5',
     })
     .runWithBuild()
-  t.true(
+  expect(
     normalizeOutput(output).includes(
       'Secrets scanning skipped because no env vars marked as secret are set to non-empty/non-trivial values or they are all omitted with SECRETS_SCAN_OMIT_KEYS env var setting.',
     ),
-  )
+  ).toBe(true)
 })
 
-test('secrets scanning, should skip when secrets passed but SECRETS_SCAN_OMIT_KEYS omits all of them', async (t) => {
+test('secrets scanning, should skip when secrets passed but SECRETS_SCAN_OMIT_KEYS omits all of them', async () => {
   const output = await new Fixture('./fixtures/src_scanning_omit_all_keys')
     .withFlags({ debug: false, explicitSecretKeys: 'ENV_VAR_1,ENV_VAR_2' })
     .runWithBuild()
-  t.true(normalizeOutput(output).includes('SECRETS_SCAN_OMIT_KEYS override option set to: ENV_VAR_2,ENV_VAR_1'))
-  t.true(
+  expect(normalizeOutput(output).includes('SECRETS_SCAN_OMIT_KEYS override option set to: ENV_VAR_2,ENV_VAR_1')).toBe(
+    true,
+  )
+  expect(
     normalizeOutput(output).includes(
       'Secrets scanning skipped because no env vars marked as secret are set to non-empty/non-trivial values or they are all omitted with SECRETS_SCAN_OMIT_KEYS env var setting.',
     ),
-  )
+  ).toBe(true)
 })
 
-test('secrets scanning, should skip when secrets passed but SECRETS_SCAN_OMIT_PATHS omits all files', async (t) => {
+test('secrets scanning, should skip when secrets passed but SECRETS_SCAN_OMIT_PATHS omits all files', async () => {
   const output = await new Fixture('./fixtures/src_scanning_omit_all_paths')
     .withFlags({ debug: false, explicitSecretKeys: 'ENV_VAR_1,ENV_VAR_2' })
     .runWithBuild()
-  t.true(normalizeOutput(output).includes('SECRETS_SCAN_OMIT_PATHS override option set to: /external/path'))
-  t.true(
+  expect(normalizeOutput(output).includes('SECRETS_SCAN_OMIT_PATHS override option set to: /external/path')).toBe(true)
+  expect(
     normalizeOutput(output).includes(
       'Secrets scanning skipped because there are no files or all files were omitted with SECRETS_SCAN_OMIT_PATHS env var setting.',
     ),
-  )
+  ).toBe(true)
 })
 
-test('secrets scanning, should skip when secrets passed but SECRETS_SCAN_OMIT_PATHS omits globbed files', async (t) => {
+test('secrets scanning, should skip when secrets passed but SECRETS_SCAN_OMIT_PATHS omits globbed files', async () => {
   const output = await new Fixture('./fixtures/src_scanning_omit_glob_path')
     .withFlags({ debug: false, explicitSecretKeys: 'ENV_VAR_1,ENV_VAR_2' })
     .runWithBuild()
 
-  t.false(normalizeOutput(output).includes('found value at line 1 in dist/safefile.js'))
-  t.false(normalizeOutput(output).includes('found value at line 1 in src/static-files/safefile.js'))
+  expect(normalizeOutput(output).includes('found value at line 1 in dist/safefile.js')).toBe(false)
+  expect(normalizeOutput(output).includes('found value at line 1 in src/static-files/safefile.js')).toBe(false)
 
   // Ensure SECRETS_SCAN_OMIT_PATHS doesn't exclude more than the defined glob
-  t.assert(normalizeOutput(output).includes('found value at line 1 in src/static-files/notsafefile.js'))
+  expect(normalizeOutput(output).includes('found value at line 1 in src/static-files/notsafefile.js')).toBeTruthy()
 })
 
-test('secrets scanning, should fail build and report to API when it finds secrets in the src and build output', async (t) => {
+test('secrets scanning, should fail build and report to API when it finds secrets in the src and build output', async () => {
   const { output, requests } = await new Fixture('./fixtures/src_scanning_env_vars_set_non_empty')
     .withFlags({
       debug: false,
@@ -84,20 +88,20 @@ test('secrets scanning, should fail build and report to API when it finds secret
       token: 'test',
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
-  t.true(
+  expect(
     normalizeOutput(output).includes(
       'Scanning complete. 14 file(s) scanned. Secrets scanning found 6 instance(s) of secrets in build output or repo code.',
     ),
-  )
-  t.true(
+  ).toBe(true)
+  expect(
     normalizeOutput(output).includes(
       `Secret env var "ENV_VAR_1"'s value detected:\n` +
         `  found value at line 12 in dist/static-files/static-a.txt\n` +
         `  found value at line 6 in netlify.toml\n` +
         `  found value at line 12 in src/static-files/static-a.txt\n`,
     ),
-  )
-  t.true(
+  ).toBe(true)
+  expect(
     normalizeOutput(output).includes(
       `Secret env var "ENV_VAR_2"'s value detected:\n` +
         `  found value at line 1 in dist/some-file.txt\n` +
@@ -108,8 +112,8 @@ test('secrets scanning, should fail build and report to API when it finds secret
         `  found value at line 1 in src/static-files/static-a.txt\n` +
         `  found value at line 6 in src/static-files/static-a.txt\n`,
     ),
-  )
-  t.true(
+  ).toBe(true)
+  expect(
     normalizeOutput(output).includes(
       `Secret env var "ENV_VAR_3"'s value detected:\n` +
         `  found value at line 14 in dist/static-files/static-a.txt\n` +
@@ -120,16 +124,16 @@ test('secrets scanning, should fail build and report to API when it finds secret
         `  found value at line 16 in src/static-files/static-a.txt\n` +
         `  found value at line 1 in src/static-files/static-c.txt\n`,
     ),
-  )
-  t.true(
+  ).toBe(true)
+  expect(
     normalizeOutput(output).includes(
       `Secret env var "ENV_VAR_4"'s value detected:\n` +
         `  found value at line 20 in dist/static-files/static-a.txt\n` +
         `  found value at line 9 in netlify.toml\n` +
         `  found value at line 20 in src/static-files/static-a.txt\n`,
     ),
-  )
-  t.true(
+  ).toBe(true)
+  expect(
     normalizeOutput(output).includes(
       `Secret env var "ENV_VAR_MULTILINE_A"'s value detected:\n` +
         `  found value at line 17 in dist/static-files/static-c.txt\n` +
@@ -140,8 +144,8 @@ test('secrets scanning, should fail build and report to API when it finds secret
         `  found value at line 38 in src/static-files/static-c.txt\n` +
         `  found value at line 1 in src/static-files/static-d.txt\n`,
     ),
-  )
-  t.true(
+  ).toBe(true)
+  expect(
     normalizeOutput(output).includes(
       `Secret env var "ENV_VAR_MULTILINE_B"'s value detected:\n` +
         `  found value at line 4 in dist/static-files/static-d.txt\n` +
@@ -150,18 +154,18 @@ test('secrets scanning, should fail build and report to API when it finds secret
         `  found value at line 4 in src/static-files/static-d.txt\n` +
         `  found value at line 1 in src/static-files/static-e.txt\n`,
     ),
-  )
+  ).toBe(true)
 
-  t.true(requests.length === 1)
+  expect(requests.length === 1).toBe(true)
   const request = requests[0]
-  t.is(request.method, 'PATCH')
-  t.is(request.url, '/api/v1/deploys/test/validations_report')
-  t.truthy(request.body.secrets_scan.scannedFilesCount)
-  t.is(request.body.secrets_scan.secretsScanMatches.length, 32)
-  t.is(request.body.secrets_scan.enhancedSecretsScanMatches.length, 0)
+  expect(request.method).toBe('PATCH')
+  expect(request.url).toBe('/api/v1/deploys/test/validations_report')
+  expect(request.body.secrets_scan.scannedFilesCount).toBeTruthy()
+  expect(request.body.secrets_scan.secretsScanMatches.length).toBe(32)
+  expect(request.body.secrets_scan.enhancedSecretsScanMatches.length).toBe(0)
 })
 
-test('secrets scanning should report success to API when no secrets are found', async (t) => {
+test('secrets scanning should report success to API when no secrets are found', async () => {
   const { requests } = await new Fixture('./fixtures/src_scanning_env_vars_no_matches')
     .withFlags({
       debug: false,
@@ -171,16 +175,16 @@ test('secrets scanning should report success to API when no secrets are found', 
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
 
-  t.true(requests.length === 1)
+  expect(requests.length === 1).toBe(true)
   const request = requests[0]
-  t.is(request.method, 'PATCH')
-  t.is(request.url, '/api/v1/deploys/test/validations_report')
-  t.truthy(request.body.secrets_scan.scannedFilesCount)
-  t.truthy(request.body.secrets_scan.secretsScanMatches)
-  t.truthy(request.body.secrets_scan.enhancedSecretsScanMatches)
+  expect(request.method).toBe('PATCH')
+  expect(request.url).toBe('/api/v1/deploys/test/validations_report')
+  expect(request.body.secrets_scan.scannedFilesCount).toBeTruthy()
+  expect(request.body.secrets_scan.secretsScanMatches).toBeTruthy()
+  expect(request.body.secrets_scan.enhancedSecretsScanMatches).toBeTruthy()
 })
 
-test('secrets scanning failure should produce an user error', async (t) => {
+test('secrets scanning failure should produce an user error', async () => {
   const { severityCode } = await new Fixture('./fixtures/src_scanning_env_vars_set_non_empty')
     .withFlags({
       debug: false,
@@ -189,10 +193,10 @@ test('secrets scanning failure should produce an user error', async (t) => {
     })
     .runBuildProgrammatic()
   // Severity code of 2 is user error
-  t.is(severityCode, 2)
+  expect(severityCode).toBe(2)
 })
 
-test('secrets scan does not send report to API for local builds', async (t) => {
+test('secrets scan does not send report to API for local builds', async () => {
   const { requests } = await new Fixture('./fixtures/src_scanning_env_vars_set_non_empty')
     .withFlags({
       debug: false,
@@ -203,26 +207,26 @@ test('secrets scan does not send report to API for local builds', async (t) => {
     })
     .runBuildServer({ path: '/api/v1/deploys/0/validations_report' })
 
-  t.true(requests.length === 0)
+  expect(requests.length === 0).toBe(true)
 })
 
-test('secrets scanning, should not fail if the secrets values are not detected in the build output', async (t) => {
+test('secrets scanning, should not fail if the secrets values are not detected in the build output', async () => {
   const output = await new Fixture('./fixtures/src_scanning_env_vars_no_matches')
     .withFlags({ debug: false, explicitSecretKeys: 'ENV_VAR_1,ENV_VAR_2' })
     .runWithBuild()
-  t.true(output.includes(`No secrets detected in build output or repo code!`))
+  expect(output.includes(`No secrets detected in build output or repo code!`)).toBe(true)
 })
 
-test('secrets scanning should not scan .cache/ directory', async (t) => {
+test('secrets scanning should not scan .cache/ directory', async () => {
   const output = await new Fixture('./fixtures/src_scanning_omit_cache_path')
     .withFlags({ debug: false, explicitSecretKeys: 'ENV_VAR_1,ENV_VAR_2' })
     .runWithBuild()
-  t.true(output.includes(`No secrets detected in build output or repo code!`))
+  expect(output.includes(`No secrets detected in build output or repo code!`)).toBe(true)
 })
 
 // Enhanced secret scanning with enhanced_secret_scan_impacts_builds enabled
 
-test('secrets scanning, enhanced scan should not run when disabled', async (t) => {
+test('secrets scanning, enhanced scan should not run when disabled', async () => {
   const { requests } = await new Fixture('./fixtures/src_scanning_disabled')
     .withFlags({
       debug: false,
@@ -232,10 +236,10 @@ test('secrets scanning, enhanced scan should not run when disabled', async (t) =
       featureFlags: { enhanced_secret_scan_impacts_builds: true },
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
-  t.true(requests.length === 0)
+  expect(requests.length === 0).toBe(true)
 })
 
-test('secrets scanning, should skip when enhanced scan and likely secrets passed but SECRETS_SCAN_OMIT_PATHS omits all files', async (t) => {
+test('secrets scanning, should skip when enhanced scan and likely secrets passed but SECRETS_SCAN_OMIT_PATHS omits all files', async () => {
   const { requests } = await new Fixture('./fixtures/src_scanning_omit_all_paths')
     .withFlags({
       debug: false,
@@ -247,10 +251,10 @@ test('secrets scanning, should skip when enhanced scan and likely secrets passed
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
 
-  t.true(requests.length === 0)
+  expect(requests.length === 0).toBe(true)
 })
 
-test('secrets scanning, enhanced scan should not find matches when disabled with SECRETS_SCAN_SMART_DETECTION_ENABLED set to false', async (t) => {
+test('secrets scanning, enhanced scan should not find matches when disabled with SECRETS_SCAN_SMART_DETECTION_ENABLED set to false', async () => {
   const { requests } = await new Fixture('./fixtures/src_scanning_likely_enhanced_scan_secrets_disabled')
     .withFlags({
       debug: false,
@@ -261,12 +265,12 @@ test('secrets scanning, enhanced scan should not find matches when disabled with
       featureFlags: { enhanced_secret_scan_impacts_builds: true },
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
-  t.true(requests.length === 1)
+  expect(requests.length === 1).toBe(true)
   const request = requests[0]
-  t.is(request.body.secrets_scan.enhancedSecretsScanMatches.length, 0)
+  expect(request.body.secrets_scan.enhancedSecretsScanMatches.length).toBe(0)
 })
 
-test('secrets scanning, enhanced scan should skip matches defined in SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES', async (t) => {
+test('secrets scanning, enhanced scan should skip matches defined in SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES', async () => {
   const { requests, output } = await new Fixture('./fixtures/src_scanning_likely_enhanced_scan_secrets_omitted')
     .withFlags({
       debug: false,
@@ -278,13 +282,13 @@ test('secrets scanning, enhanced scan should skip matches defined in SECRETS_SCA
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
 
-  t.true(normalizeOutput(output).includes('SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES override option set'))
-  t.true(requests.length === 1)
+  expect(normalizeOutput(output).includes('SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES override option set')).toBe(true)
+  expect(requests.length === 1).toBe(true)
   const request = requests[0]
-  t.is(request.body.secrets_scan.enhancedSecretsScanMatches.length, 0)
+  expect(request.body.secrets_scan.enhancedSecretsScanMatches.length).toBe(0)
 })
 
-test('secrets scanning, SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES not logged if enhanced scanning not enabled', async (t) => {
+test('secrets scanning, SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES not logged if enhanced scanning not enabled', async () => {
   const { output } = await new Fixture('./fixtures/src_scanning_likely_enhanced_scan_secrets_omitted')
     .withFlags({
       debug: false,
@@ -296,10 +300,10 @@ test('secrets scanning, SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES not logged if e
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
 
-  t.false(normalizeOutput(output).includes('SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES override option set'))
+  expect(normalizeOutput(output).includes('SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES override option set')).toBe(false)
 })
 
-test('secrets scanning, should run when enhanced scan enabled and no env vars set', async (t) => {
+test('secrets scanning, should run when enhanced scan enabled and no env vars set', async () => {
   const { requests } = await new Fixture('./fixtures/src_default')
     .withFlags({
       debug: false,
@@ -311,15 +315,15 @@ test('secrets scanning, should run when enhanced scan enabled and no env vars se
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
 
-  t.true(requests.length === 1)
+  expect(requests.length === 1).toBe(true)
   const request = requests[0]
-  t.is(request.url, '/api/v1/deploys/test/validations_report')
-  t.truthy(request.body.secrets_scan.scannedFilesCount)
-  t.truthy(request.body.secrets_scan.secretsScanMatches)
-  t.truthy(request.body.secrets_scan.enhancedSecretsScanMatches)
+  expect(request.url).toBe('/api/v1/deploys/test/validations_report')
+  expect(request.body.secrets_scan.scannedFilesCount).toBeTruthy()
+  expect(request.body.secrets_scan.secretsScanMatches).toBeTruthy()
+  expect(request.body.secrets_scan.enhancedSecretsScanMatches).toBeTruthy()
 })
 
-test('secrets scanning, should not find secrets in files without known prefixes', async (t) => {
+test('secrets scanning, should not find secrets in files without known prefixes', async () => {
   const { requests } = await new Fixture('./fixtures/src_scanning_no_likely_enhanced_scan_secrets')
     .withFlags({
       debug: false,
@@ -330,15 +334,15 @@ test('secrets scanning, should not find secrets in files without known prefixes'
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
 
-  t.true(requests.length === 1)
+  expect(requests.length === 1).toBe(true)
   const request = requests[0]
-  t.is(request.method, 'PATCH')
-  t.is(request.url, '/api/v1/deploys/test/validations_report')
-  t.truthy(request.body.secrets_scan.scannedFilesCount)
-  t.is(request.body.secrets_scan.enhancedSecretsScanMatches.length, 0)
+  expect(request.method).toBe('PATCH')
+  expect(request.url).toBe('/api/v1/deploys/test/validations_report')
+  expect(request.body.secrets_scan.scannedFilesCount).toBeTruthy()
+  expect(request.body.secrets_scan.enhancedSecretsScanMatches.length).toBe(0)
 })
 
-test('secrets scanning, run and report result to API when there are no secrets and enhanced scan is enabled with likely secrets', async (t) => {
+test('secrets scanning, run and report result to API when there are no secrets and enhanced scan is enabled with likely secrets', async () => {
   const { requests } = await new Fixture('./fixtures/src_scanning_likely_enhanced_scan_secrets')
     .withFlags({
       debug: false,
@@ -350,16 +354,16 @@ test('secrets scanning, run and report result to API when there are no secrets a
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
 
-  t.true(requests.length === 1)
+  expect(requests.length === 1).toBe(true)
   const request = requests[0]
-  t.is(request.method, 'PATCH')
-  t.is(request.url, '/api/v1/deploys/test/validations_report')
-  t.truthy(request.body.secrets_scan.scannedFilesCount)
-  t.truthy(request.body.secrets_scan.secretsScanMatches)
-  t.truthy(request.body.secrets_scan.enhancedSecretsScanMatches)
+  expect(request.method).toBe('PATCH')
+  expect(request.url).toBe('/api/v1/deploys/test/validations_report')
+  expect(request.body.secrets_scan.scannedFilesCount).toBeTruthy()
+  expect(request.body.secrets_scan.secretsScanMatches).toBeTruthy()
+  expect(request.body.secrets_scan.enhancedSecretsScanMatches).toBeTruthy()
 })
 
-test('secrets scanning, should fail build and report to API when enhanced scan finds likely secret in the src and build output', async (t) => {
+test('secrets scanning, should fail build and report to API when enhanced scan finds likely secret in the src and build output', async () => {
   const { output, requests } = await new Fixture('./fixtures/src_scanning_likely_enhanced_scan_secrets')
     .withFlags({
       debug: false,
@@ -371,22 +375,22 @@ test('secrets scanning, should fail build and report to API when enhanced scan f
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
 
-  t.assert(normalizeOutput(output).includes(`"sk_***" detected as a likely secret`))
-  t.assert(
+  expect(normalizeOutput(output).includes(`"sk_***" detected as a likely secret`)).toBeTruthy()
+  expect(
     normalizeOutput(output).includes(
       `the build will fail until these likely secret values are not found in build output or repo files`,
     ),
-  )
-  t.true(requests.length === 1)
+  ).toBeTruthy()
+  expect(requests.length === 1).toBe(true)
   const request = requests[0]
-  t.is(request.method, 'PATCH')
-  t.is(request.url, '/api/v1/deploys/test/validations_report')
-  t.truthy(request.body.secrets_scan.scannedFilesCount)
-  t.is(request.body.secrets_scan.secretsScanMatches.length, 0)
-  t.is(request.body.secrets_scan.enhancedSecretsScanMatches.length, 1)
+  expect(request.method).toBe('PATCH')
+  expect(request.url).toBe('/api/v1/deploys/test/validations_report')
+  expect(request.body.secrets_scan.scannedFilesCount).toBeTruthy()
+  expect(request.body.secrets_scan.secretsScanMatches.length).toBe(0)
+  expect(request.body.secrets_scan.enhancedSecretsScanMatches.length).toBe(1)
 })
 
-test('secrets scanning, should report success to API when enhanced scans finds no likely secrets', async (t) => {
+test('secrets scanning, should report success to API when enhanced scans finds no likely secrets', async () => {
   const { requests } = await new Fixture('./fixtures/src_scanning_env_vars_no_matches')
     .withFlags({
       debug: false,
@@ -397,16 +401,16 @@ test('secrets scanning, should report success to API when enhanced scans finds n
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
 
-  t.true(requests.length === 1)
+  expect(requests.length === 1).toBe(true)
   const request = requests[0]
-  t.is(request.method, 'PATCH')
-  t.is(request.url, '/api/v1/deploys/test/validations_report')
-  t.truthy(request.body.secrets_scan.scannedFilesCount)
-  t.truthy(request.body.secrets_scan.secretsScanMatches)
-  t.truthy(request.body.secrets_scan.enhancedSecretsScanMatches)
+  expect(request.method).toBe('PATCH')
+  expect(request.url).toBe('/api/v1/deploys/test/validations_report')
+  expect(request.body.secrets_scan.scannedFilesCount).toBeTruthy()
+  expect(request.body.secrets_scan.secretsScanMatches).toBeTruthy()
+  expect(request.body.secrets_scan.enhancedSecretsScanMatches).toBeTruthy()
 })
 
-test('secrets scanning, enhanced scanning failure should produce a user error', async (t) => {
+test('secrets scanning, enhanced scanning failure should produce a user error', async () => {
   const { severityCode } = await new Fixture('./fixtures/src_scanning_likely_enhanced_scan_secrets')
     .withFlags({
       debug: false,
@@ -416,12 +420,12 @@ test('secrets scanning, enhanced scanning failure should produce a user error', 
     })
     .runBuildProgrammatic()
   // Severity code of 2 is user error
-  t.is(severityCode, 2)
+  expect(severityCode).toBe(2)
 })
 
 // enhanced scanning enabled, but without impact to builds
 
-test('secrets scanning, should not log enhanced scan info when enhanced_secret_scan_impacts_builds is false', async (t) => {
+test('secrets scanning, should not log enhanced scan info when enhanced_secret_scan_impacts_builds is false', async () => {
   const { output } = await new Fixture('./fixtures/src_scanning_likely_enhanced_scan_secrets')
     .withFlags({
       debug: false,
@@ -433,10 +437,10 @@ test('secrets scanning, should not log enhanced scan info when enhanced_secret_s
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
 
   const normalizedOutput = normalizeOutput(output)
-  t.false(normalizedOutput.includes('detected as a likely secret'))
+  expect(normalizedOutput.includes('detected as a likely secret')).toBe(false)
 })
 
-test('secrets scanning, should not fail build when enhanced scan finds likely secrets but enhanced_secret_scan_impacts_builds is false', async (t) => {
+test('secrets scanning, should not fail build when enhanced scan finds likely secrets but enhanced_secret_scan_impacts_builds is false', async () => {
   const { severityCode } = await new Fixture('./fixtures/src_scanning_likely_enhanced_scan_secrets')
     .withFlags({
       debug: false,
@@ -446,10 +450,10 @@ test('secrets scanning, should not fail build when enhanced scan finds likely se
     .runBuildProgrammatic()
 
   // Severity code of 0 means success, 2 would be user error
-  t.is(severityCode, 0)
+  expect(severityCode).toBe(0)
 })
 
-test('secrets scanning, should not log omit values message when enhanced_secret_scan_impacts_builds is false', async (t) => {
+test('secrets scanning, should not log omit values message when enhanced_secret_scan_impacts_builds is false', async () => {
   const { output } = await new Fixture('./fixtures/src_scanning_likely_enhanced_scan_secrets_omitted')
     .withFlags({
       debug: false,
@@ -460,10 +464,10 @@ test('secrets scanning, should not log omit values message when enhanced_secret_
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
 
-  t.false(normalizeOutput(output).includes('ENHANCED_SECRETS_SCAN_OMIT_VALUES'))
+  expect(normalizeOutput(output).includes('ENHANCED_SECRETS_SCAN_OMIT_VALUES')).toBe(false)
 })
 
-test('secrets scanning, should run enhanced scan in passive mode when explicit keys are present', async (t) => {
+test('secrets scanning, should run enhanced scan in passive mode when explicit keys are present', async () => {
   const { requests } = await new Fixture('./fixtures/src_scanning_env_vars_set_non_empty')
     .withFlags({
       debug: false,
@@ -475,14 +479,14 @@ test('secrets scanning, should run enhanced scan in passive mode when explicit k
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
 
-  t.true(requests.length === 1)
+  expect(requests.length === 1).toBe(true)
   const request = requests[0]
-  t.is(request.url, '/api/v1/deploys/test/validations_report')
-  t.truthy(request.body.secrets_scan.scannedFilesCount)
-  t.truthy(request.body.secrets_scan.enhancedSecretsScanMatches)
+  expect(request.url).toBe('/api/v1/deploys/test/validations_report')
+  expect(request.body.secrets_scan.scannedFilesCount).toBeTruthy()
+  expect(request.body.secrets_scan.enhancedSecretsScanMatches).toBeTruthy()
 })
 
-test('secrets scanning, should not run enhanced scan in passive mode when no explicit keys', async (t) => {
+test('secrets scanning, should not run enhanced scan in passive mode when no explicit keys', async () => {
   const { requests } = await new Fixture('./fixtures/src_scanning_likely_enhanced_scan_secrets')
     .withFlags({
       debug: false,
@@ -494,10 +498,10 @@ test('secrets scanning, should not run enhanced scan in passive mode when no exp
     })
     .runBuildServer({ path: '/api/v1/deploys/test/validations_report' })
 
-  t.true(requests.length === 0)
+  expect(requests.length === 0).toBe(true)
 })
 
-test('does not crash if line in scanned file exceed available memory', async (t) => {
+test('does not crash if line in scanned file exceed available memory', async () => {
   const { output } = await new Fixture('./fixtures/src_scanning_large_binary_file')
     .withEnv({
       // fixture produces a ~256MB file with single line, so this intentionally limits available memory
@@ -511,10 +515,9 @@ test('does not crash if line in scanned file exceed available memory', async (t)
     })
     .runBuildBinary()
 
-  t.assert(
+  expect(
     normalizeOutput(output).includes(
       `Secret env var "ENV_SECRET"'s value detected:\n` + `  found value at line 1 in dist/out.txt\n`,
     ),
-    'Scanning should find a secret, instead got: ' + normalizeOutput(output),
-  )
+  ).toBeTruthy()
 })

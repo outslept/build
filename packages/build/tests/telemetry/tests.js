@@ -1,7 +1,7 @@
 import { versions } from 'process'
 
 import { Fixture, normalizeOutput, startServer } from '@netlify/testing'
-import test from 'ava'
+import { test, expect } from 'vitest'
 
 const TELEMETRY_PATH = '/track'
 const BUGSNAG_TEST_KEY = '00000000000000000000000000000000'
@@ -37,7 +37,6 @@ const normalizePlugin = function ({ nodeVersion, version, ...plugin }) {
 }
 
 const runWithApiMock = async function (
-  t,
   fixture,
   {
     env = {},
@@ -84,14 +83,14 @@ const runWithApiMock = async function (
       const { exitCode, output } = await fix.runBuildBinary()
 
       if (snapshot) {
-        t.snapshot(normalizeOutput(output))
+        expect(normalizeOutput(output)).toMatchSnapshot()
       }
       return { exitCode, telemetryRequests }
     }
 
     const output = await fix.runWithBuild()
     if (snapshot) {
-      t.snapshot(normalizeOutput(output))
+      expect(normalizeOutput(output)).toMatchSnapshot()
     }
 
     return { exitCode: undefined, telemetryRequests }
@@ -100,143 +99,143 @@ const runWithApiMock = async function (
   }
 }
 
-test('Telemetry success generates no logs', async (t) => {
-  const { telemetryRequests } = await runWithApiMock(t, 'success', { snapshot: true })
-  t.is(telemetryRequests.length, 1)
+test('Telemetry success generates no logs', async () => {
+  const { telemetryRequests } = await runWithApiMock('success', { snapshot: true })
+  expect(telemetryRequests.length).toBe(1)
 })
 
-test('Telemetry error only reports to error monitor and does not affect build success', async (t) => {
-  const { exitCode } = await runWithApiMock(t, 'success', {
+test('Telemetry error only reports to error monitor and does not affect build success', async () => {
+  const { exitCode } = await runWithApiMock('success', {
     responseStatusCode: 500,
     // Execute via cli so that we can validate the exitCode
     useBinary: true,
     snapshot: true,
   })
-  t.is(exitCode, 0)
+  expect(exitCode).toBe(0)
 })
 
-test('Telemetry reports build success', async (t) => {
-  const { telemetryRequests } = await runWithApiMock(t, 'success')
+test('Telemetry reports build success', async () => {
+  const { telemetryRequests } = await runWithApiMock('success')
   const snapshot = telemetryRequests.map(normalizeSnapshot)
-  t.snapshot(snapshot)
+  expect(snapshot).toMatchSnapshot()
 })
 
-test('Telemetry reports local plugins success', async (t) => {
-  const { telemetryRequests } = await runWithApiMock(t, 'plugin_success')
+test('Telemetry reports local plugins success', async () => {
+  const { telemetryRequests } = await runWithApiMock('plugin_success')
   const snapshot = telemetryRequests.map(normalizeSnapshot)
-  t.snapshot(snapshot)
+  expect(snapshot).toMatchSnapshot()
 })
 
-test('Telemetry reports package.json plugins success', async (t) => {
-  const { telemetryRequests } = await runWithApiMock(t, 'plugin_package')
+test('Telemetry reports package.json plugins success', async () => {
+  const { telemetryRequests } = await runWithApiMock('plugin_package')
   const snapshot = telemetryRequests.map(normalizeSnapshot)
-  t.snapshot(snapshot)
+  expect(snapshot).toMatchSnapshot()
 })
 
-test('Telemetry reports netlify.toml-only plugins success', async (t) => {
-  const { telemetryRequests } = await runWithApiMock(t, 'plugins_cache_config', {
+test('Telemetry reports netlify.toml-only plugins success', async () => {
+  const { telemetryRequests } = await runWithApiMock('plugins_cache_config', {
     testOpts: { pluginsListUrl: undefined },
   })
   const snapshot = telemetryRequests.map(normalizeSnapshot)
-  t.snapshot(snapshot)
+  expect(snapshot).toMatchSnapshot()
 })
 
-test('Telemetry reports UI plugins success', async (t) => {
-  const { telemetryRequests } = await runWithApiMock(t, 'plugins_cache_ui', {
+test('Telemetry reports UI plugins success', async () => {
+  const { telemetryRequests } = await runWithApiMock('plugins_cache_ui', {
     defaultConfig: { plugins: [{ package: 'netlify-plugin-contextual-env' }] },
     testOpts: { pluginsListUrl: undefined },
   })
   const snapshot = telemetryRequests.map(normalizeSnapshot)
-  t.snapshot(snapshot)
+  expect(snapshot).toMatchSnapshot()
 })
 
-test('Telemetry reports build cancellation', async (t) => {
-  const { telemetryRequests } = await runWithApiMock(t, 'cancel')
+test('Telemetry reports build cancellation', async () => {
+  const { telemetryRequests } = await runWithApiMock('cancel')
   const snapshot = telemetryRequests.map(normalizeSnapshot)
-  t.snapshot(snapshot)
+  expect(snapshot).toMatchSnapshot()
 })
 
-test('Telemetry reports user error', async (t) => {
-  const { telemetryRequests } = await runWithApiMock(t, 'invalid')
+test('Telemetry reports user error', async () => {
+  const { telemetryRequests } = await runWithApiMock('invalid')
   const snapshot = telemetryRequests.map(normalizeSnapshot)
-  t.snapshot(snapshot)
+  expect(snapshot).toMatchSnapshot()
 })
 
-test('Telemetry reports plugin error', async (t) => {
-  const { telemetryRequests } = await runWithApiMock(t, 'plugin_error')
+test('Telemetry reports plugin error', async () => {
+  const { telemetryRequests } = await runWithApiMock('plugin_error')
   const snapshot = telemetryRequests.map(normalizeSnapshot)
-  t.snapshot(snapshot)
+  expect(snapshot).toMatchSnapshot()
 })
 
-test('Telemetry is disabled by default', async (t) => {
+test('Telemetry is disabled by default', async () => {
   // We're just overriding our default test harness behaviour
-  const { telemetryRequests } = await runWithApiMock(t, 'success', { telemetry: null })
-  t.is(telemetryRequests.length, 0)
+  const { telemetryRequests } = await runWithApiMock('success', { telemetry: null })
+  expect(telemetryRequests.length).toBe(0)
 })
 
-test('Telemetry BUILD_TELEMETRY_DISABLED env var overrides flag', async (t) => {
-  const { telemetryRequests } = await runWithApiMock(t, 'success', {
+test('Telemetry BUILD_TELEMETRY_DISABLED env var overrides flag', async () => {
+  const { telemetryRequests } = await runWithApiMock('success', {
     env: { BUILD_TELEMETRY_DISABLED: 'true' },
   })
-  t.is(telemetryRequests.length, 0)
+  expect(telemetryRequests.length).toBe(0)
 })
 
-test('Telemetry node version reported is based on the version provided by the user', async (t) => {
+test('Telemetry node version reported is based on the version provided by the user', async () => {
   const nodeVersion = '8.8.0'
-  const { telemetryRequests } = await runWithApiMock(t, 'success', {
+  const { telemetryRequests } = await runWithApiMock('success', {
     nodePath: `/test/.nvm/versions/node/v${nodeVersion}/bin/node`,
   })
-  t.is(telemetryRequests.length, 1)
-  t.is(telemetryRequests[0].body.properties.nodeVersion, nodeVersion)
+  expect(telemetryRequests.length).toBe(1)
+  expect(telemetryRequests[0].body.properties.nodeVersion).toBe(nodeVersion)
 })
 
-test('Telemetry node version reported is based on the current process version if none is provided', async (t) => {
-  const { telemetryRequests } = await runWithApiMock(t, 'success')
-  t.is(telemetryRequests.length, 1)
-  t.is(telemetryRequests[0].body.properties.nodeVersion, versions.node)
+test('Telemetry node version reported is based on the current process version if none is provided', async () => {
+  const { telemetryRequests } = await runWithApiMock('success')
+  expect(telemetryRequests.length).toBe(1)
+  expect(telemetryRequests[0].body.properties.nodeVersion).toBe(versions.node)
 })
 
-test('Telemetry reports a framework if any is given', async (t) => {
+test('Telemetry reports a framework if any is given', async () => {
   const framework = 'gatsby'
-  const { telemetryRequests } = await runWithApiMock(t, 'success', { framework })
-  t.is(telemetryRequests.length, 1)
-  t.is(telemetryRequests[0].body.properties.framework, framework)
+  const { telemetryRequests } = await runWithApiMock('success', { framework })
+  expect(telemetryRequests.length).toBe(1)
+  expect(telemetryRequests[0].body.properties.framework).toBe(framework)
 })
 
-test('Telemetry reports no framework if none is provided', async (t) => {
-  const { telemetryRequests } = await runWithApiMock(t, 'success')
-  t.is(telemetryRequests.length, 1)
-  t.is(telemetryRequests[0].body.properties.framework, undefined)
+test('Telemetry reports no framework if none is provided', async () => {
+  const { telemetryRequests } = await runWithApiMock('success')
+  expect(telemetryRequests.length).toBe(1)
+  expect(telemetryRequests[0].body.properties.framework).toBe(undefined)
 })
 
-test('Telemetry reports the build id if given via BUILD_ID', async (t) => {
+test('Telemetry reports the build id if given via BUILD_ID', async () => {
   const buildId = 'test-build-id'
-  const { telemetryRequests } = await runWithApiMock(t, 'success', { env: { BUILD_ID: buildId } })
-  t.is(telemetryRequests.length, 1)
-  t.is(telemetryRequests[0].body.properties.buildId, buildId)
+  const { telemetryRequests } = await runWithApiMock('success', { env: { BUILD_ID: buildId } })
+  expect(telemetryRequests.length).toBe(1)
+  expect(telemetryRequests[0].body.properties.buildId).toBe(buildId)
 })
 
-test('Telemetry reports a deploy id if given via DEPLOY_ID', async (t) => {
+test('Telemetry reports a deploy id if given via DEPLOY_ID', async () => {
   const deployId = 'test-deploy-id'
-  const { telemetryRequests } = await runWithApiMock(t, 'success', { env: { DEPLOY_ID: deployId } })
-  t.is(telemetryRequests.length, 1)
-  t.is(telemetryRequests[0].body.properties.deployId, deployId)
+  const { telemetryRequests } = await runWithApiMock('success', { env: { DEPLOY_ID: deployId } })
+  expect(telemetryRequests.length).toBe(1)
+  expect(telemetryRequests[0].body.properties.deployId).toBe(deployId)
 })
 
-test('Telemetry reports a deploy id if given via --deployId flag', async (t) => {
+test('Telemetry reports a deploy id if given via --deployId flag', async () => {
   const deployId = 'test-deploy-id'
-  const { telemetryRequests } = await runWithApiMock(t, 'success', { deployId })
-  t.is(telemetryRequests.length, 1)
-  t.is(telemetryRequests[0].body.properties.deployId, deployId)
+  const { telemetryRequests } = await runWithApiMock('success', { deployId })
+  expect(telemetryRequests.length).toBe(1)
+  expect(telemetryRequests[0].body.properties.deployId).toBe(deployId)
 })
 
-test('Telemetry calls timeout by default', async (t) => {
-  const { telemetryRequests } = await runWithApiMock(t, 'success', {
+test('Telemetry calls timeout by default', async () => {
+  const { telemetryRequests } = await runWithApiMock('success', {
     // Force a client side timeout
     telemetryTimeout: 0,
     waitTelemetryServer: 1000,
     // The error monitor snapshot should contain the timeout error
     snapshot: true,
   })
-  t.is(telemetryRequests.length, 0)
+  expect(telemetryRequests.length).toBe(0)
 })

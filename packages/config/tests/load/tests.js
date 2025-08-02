@@ -4,131 +4,131 @@ import { cwd } from 'process'
 import { fileURLToPath } from 'url'
 
 import { Fixture, normalizeOutput } from '@netlify/testing'
-import test from 'ava'
 import { tmpName } from 'tmp-promise'
+import { test, expect } from 'vitest'
 
 import { resolveConfig } from '../../lib/main.js'
 
 const FIXTURES_DIR = fileURLToPath(new URL('fixtures', import.meta.url))
 
-test('Empty configuration', async (t) => {
+test('Empty configuration', async () => {
   const output = await new Fixture('./fixtures/empty').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('No --config but none found', async (t) => {
+test('No --config but none found', async () => {
   const output = await new Fixture('./fixtures/none').withCopyRoot().then((fixture) => fixture.runWithConfig())
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--config with an absolute path', async (t) => {
+test('--config with an absolute path', async () => {
   const output = await new Fixture().withFlags({ config: `${FIXTURES_DIR}/empty/netlify.toml` }).runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--config with a relative path', async (t) => {
+test('--config with a relative path', async () => {
   const output = await new Fixture()
     .withFlags({ config: `${relative(cwd(), FIXTURES_DIR)}/empty/netlify.toml` })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--config with an invalid relative path', async (t) => {
+test('--config with an invalid relative path', async () => {
   const output = await new Fixture().withFlags({ config: '/invalid' }).runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--defaultConfig CLI flag', async (t) => {
+test('--defaultConfig CLI flag', async () => {
   const { output } = await new Fixture('./fixtures/default_merge')
     .withFlags({ defaultConfig: JSON.stringify({ build: { publish: 'publish' } }) })
     .runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--defaultConfig merge', async (t) => {
+test('--defaultConfig merge', async () => {
   const output = await new Fixture('./fixtures/default_merge')
     .withFlags({ defaultConfig: { build: { publish: 'publish' } } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--defaultConfig priority', async (t) => {
+test('--defaultConfig priority', async () => {
   const output = await new Fixture('./fixtures/default_priority')
     .withFlags({ defaultConfig: { build: { command: 'echo commandDefault' } } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--defaultConfig merges UI plugins with config plugins', async (t) => {
+test('--defaultConfig merges UI plugins with config plugins', async () => {
   const output = await new Fixture('./fixtures/plugins_merge')
     .withFlags({ defaultConfig: { plugins: [{ package: 'one', inputs: { test: false, testThree: true } }] } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--defaultConfig can specify pinned versions', async (t) => {
+test('--defaultConfig can specify pinned versions', async () => {
   const output = await new Fixture('./fixtures/empty')
     .withFlags({ defaultConfig: { plugins: [{ package: 'one', pinned_version: '1' }] } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--defaultConfig ignores pinned versions that are empty strings', async (t) => {
+test('--defaultConfig ignores pinned versions that are empty strings', async () => {
   const output = await new Fixture('./fixtures/empty')
     .withFlags({ defaultConfig: { plugins: [{ package: 'one', pinned_version: '' }] } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--inlineConfig CLI flag', async (t) => {
+test('--inlineConfig CLI flag', async () => {
   const { output } = await new Fixture('./fixtures/default_merge')
     .withFlags({ inlineConfig: JSON.stringify({ build: { publish: 'publish' } }) })
     .runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--inlineConfig is merged', async (t) => {
+test('--inlineConfig is merged', async () => {
   const output = await new Fixture('./fixtures/default_merge')
     .withFlags({ inlineConfig: { build: { publish: 'publish' } } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--inlineConfig is merged with priority', async (t) => {
+test('--inlineConfig is merged with priority', async () => {
   const output = await new Fixture('./fixtures/default_priority')
     .withFlags({ inlineConfig: { build: { command: 'echo commandInline' } } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--inlineConfig falsy values are ignored', async (t) => {
+test('--inlineConfig falsy values are ignored', async () => {
   const output = await new Fixture('./fixtures/default_priority')
     .withFlags({ inlineConfig: { build: { command: undefined, publish: undefined } } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--inlineConfig can override the "base"', async (t) => {
+test('--inlineConfig can override the "base"', async () => {
   const output = await new Fixture('./fixtures/merge_base')
     .withFlags({
       defaultConfig: { build: { base: 'defaultBase' } },
       inlineConfig: { build: { base: 'base' } },
     })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--inlineConfig cannot use contexts', async (t) => {
+test('--inlineConfig cannot use contexts', async () => {
   const output = await new Fixture('./fixtures/default_priority')
     .withFlags({
       context: 'testContext',
       inlineConfig: { context: { testContext: { build: { command: 'echo commandPriority' } } } },
     })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--inlineConfig cannot be overridden by contexts', async (t) => {
+test('--inlineConfig cannot be overridden by contexts', async () => {
   const output = await new Fixture('./fixtures/default_priority')
     .withFlags({
       context: 'testContext',
@@ -136,17 +136,17 @@ test('--inlineConfig cannot be overridden by contexts', async (t) => {
       inlineConfig: { build: { command: 'echo commandPriority' } },
     })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--configMutations can override properties', async (t) => {
+test('--configMutations can override properties', async () => {
   const output = await new Fixture('./fixtures/default_priority')
     .withFlags({ configMutations: [{ keys: ['build', 'command'], value: 'testMutation', event: 'onPreBuild' }] })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--configMutations cannot be overridden by contexts', async (t) => {
+test('--configMutations cannot be overridden by contexts', async () => {
   const defaultConfig = { context: { testContext: { build: { command: 'echo commandDefault' } } } }
   const output = await new Fixture('./fixtures/default_priority')
     .withFlags({
@@ -154,56 +154,55 @@ test('--configMutations cannot be overridden by contexts', async (t) => {
       configMutations: [{ keys: ['build', 'command'], value: 'testMutation', event: 'onPreBuild' }],
     })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--configMutations events are validated', async (t) => {
+test('--configMutations events are validated', async () => {
   const output = await new Fixture('./fixtures/default_priority')
     .withFlags({ configMutations: [{ keys: ['build', 'command'], value: 'testMutation', event: 'onBuild' }] })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--configMutations cannot be applied on readonly properties', async (t) => {
+test('--configMutations cannot be applied on readonly properties', async () => {
   const output = await new Fixture('./fixtures/empty')
     .withFlags({ configMutations: [{ keys: ['build', 'base'], value: 'testMutation', event: 'onPreBuild' }] })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--configMutations can mutate functions top-level properties', async (t) => {
+test('--configMutations can mutate functions top-level properties', async () => {
   const output = await new Fixture('./fixtures/empty')
     .withFlags({ configMutations: [{ keys: ['functions', 'directory'], value: 'testMutation', event: 'onPreBuild' }] })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--cachedConfig CLI flags', async (t) => {
+test('--cachedConfig CLI flags', async () => {
   const returnValue = await new Fixture('./fixtures/cached_config').runWithConfig()
   const { output } = await new Fixture('./fixtures/default_merge')
     .withFlags({ cachedConfig: returnValue })
     .runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--cachedConfigPath CLI flag', async (t) => {
+test('--cachedConfigPath CLI flag', async () => {
   const cachedConfigPath = await tmpName()
   try {
     await new Fixture('./fixtures/cached_config').withFlags({ output: cachedConfigPath }).runConfigBinary()
     await new Fixture('./fixtures/cached_config').withFlags({ cachedConfigPath, context: 'test' }).runConfigBinary()
-    t.pass()
   } finally {
     await fs.unlink(cachedConfigPath)
   }
 })
 
-test('--cachedConfig', async (t) => {
+test('--cachedConfig', async () => {
   const cachedConfig = await new Fixture('./fixtures/cached_config').runWithConfigAsObject()
   const output = await new Fixture('./fixtures/cached_config').withFlags({ cachedConfig }).runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--cachedConfigPath', async (t) => {
+test('--cachedConfigPath', async () => {
   const cachedConfigPath = await tmpName()
   try {
     const returnValue = await new Fixture('./fixtures/cached_config').runWithConfig()
@@ -212,22 +211,22 @@ test('--cachedConfigPath', async (t) => {
     const output = await new Fixture('./fixtures/cached_config')
       .withFlags({ cachedConfigPath, context: 'test' })
       .runWithConfig()
-    t.snapshot(normalizeOutput(output))
+    expect(normalizeOutput(output)).toMatchSnapshot()
   } finally {
     await fs.unlink(cachedConfigPath)
   }
 })
 
-test('--cachedConfig with a token', async (t) => {
+test('--cachedConfig with a token', async () => {
   const cachedConfig = await new Fixture('./fixtures/cached_config').runWithConfigAsObject()
 
   const output = await new Fixture('./fixtures/cached_config')
     .withFlags({ cachedConfig, token: 'test' })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--cachedConfig with a siteId', async (t) => {
+test('--cachedConfig with a siteId', async () => {
   const cachedConfig = await new Fixture('./fixtures/cached_config')
     .withFlags({ siteId: 'test' })
     .runWithConfigAsObject()
@@ -235,36 +234,36 @@ test('--cachedConfig with a siteId', async (t) => {
   const output = await new Fixture('./fixtures/cached_config')
     .withFlags({ cachedConfig, siteId: 'test' })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Programmatic', async (t) => {
+test('Programmatic', async () => {
   const { config } = await resolveConfig({ repositoryRoot: `${FIXTURES_DIR}/empty` })
-  t.not(config.build.environment, undefined)
+  expect(config.build.environment).not.toBe(undefined)
 })
 
-test('Programmatic no options', async (t) => {
+test('Programmatic no options', async () => {
   const { config } = await resolveConfig()
-  t.not(config.build.environment, undefined)
+  expect(config.build.environment).not.toBe(undefined)
 })
 
-test('featureFlags can be used programmatically', async (t) => {
+test('featureFlags can be used programmatically', async () => {
   const output = await new Fixture('./fixtures/empty')
     .withFlags({ featureFlags: { test: true, testTwo: false } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('featureFlags can be used in the CLI', async (t) => {
+test('featureFlags can be used in the CLI', async () => {
   const { output } = await new Fixture('./fixtures/empty')
     .withFlags({ featureFlags: { test: true, testTwo: false } })
     .runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('featureFlags can be not used', async (t) => {
+test('featureFlags can be not used', async () => {
   const output = await new Fixture('./fixtures/empty')
     .withFlags({ featureFlags: undefined, debug: true })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })

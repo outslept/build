@@ -3,80 +3,80 @@ import { cwd } from 'process'
 import { fileURLToPath } from 'url'
 
 import { Fixture, normalizeOutput } from '@netlify/testing'
-import test from 'ava'
+import { test, expect } from 'vitest'
 
 const FIXTURES_DIR = fileURLToPath(new URL('fixtures', import.meta.url))
 
-test('--cwd with no config', async (t) => {
+test('--cwd with no config', async () => {
   const output = await new Fixture()
     .withFlags({ cwd: `${FIXTURES_DIR}/empty`, defaultConfig: { build: { publish: '/' } } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--cwd with a relative path config', async (t) => {
+test('--cwd with a relative path config', async () => {
   const output = await new Fixture()
     .withFlags({ cwd: relative(cwd(), FIXTURES_DIR), config: 'relative_cwd/netlify.toml' })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.base current directory', async (t) => {
+test('build.base current directory', async () => {
   const output = await new Fixture('./fixtures/build_base_cwd').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.base override', async (t) => {
+test('build.base override', async () => {
   const output = await new Fixture('./fixtures/build_base_override')
     .withFlags({ cwd: `${FIXTURES_DIR}/build_base_override/subdir` })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--repository-root', async (t) => {
+test('--repository-root', async () => {
   const output = await new Fixture().withFlags({ repositoryRoot: `${FIXTURES_DIR}/empty` }).runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--repository-root with cwd', async (t) => {
+test('--repository-root with cwd', async () => {
   const { output } = await new Fixture().withFlags({ repositoryRoot: 'empty' }).runConfigBinary(FIXTURES_DIR)
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('No .git', async (t) => {
+test('No .git', async () => {
   const output = await new Fixture('./fixtures/empty')
     .withCopyRoot({ git: false, cwd: true })
     .then((fixture) => fixture.runWithConfig())
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--cwd non-existing', async (t) => {
+test('--cwd non-existing', async () => {
   const output = await new Fixture()
     .withFlags({ cwd: '/invalid', repositoryRoot: `${FIXTURES_DIR}/empty` })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--cwd points to a non-directory file', async (t) => {
+test('--cwd points to a non-directory file', async () => {
   const output = await new Fixture()
     .withFlags({ cwd: `${FIXTURES_DIR}/empty/netlify.toml`, repositoryRoot: `${FIXTURES_DIR}/empty` })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--repositoryRoot non-existing', async (t) => {
+test('--repositoryRoot non-existing', async () => {
   const output = await new Fixture().withFlags({ repositoryRoot: '/invalid' }).runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--repositoryRoot points to a non-directory file', async (t) => {
+test('--repositoryRoot points to a non-directory file', async () => {
   const output = await new Fixture().withFlags({ repositoryRoot: `${FIXTURES_DIR}/empty/netlify.toml` }).runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('should detect base directory using package.json in sub dir', async (t) => {
+test('should detect base directory using package.json in sub dir', async () => {
   const output = await new Fixture('./fixtures/build_base_package_json')
     .withFlags({ cwd: `${FIXTURES_DIR}/build_base_package_json/subdir` })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })

@@ -1,6 +1,6 @@
 import { ROOT_CONTEXT, context, trace, SpanStatusCode } from '@opentelemetry/api'
 import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base'
-import test from 'ava'
+import { test, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest'
 
 import { addErrorInfo } from '../../lib/error/info.js'
 import { addBuildErrorToActiveSpan } from '../../lib/tracing/main.js'
@@ -14,60 +14,60 @@ function createContextManager(activeContext) {
   }
 }
 
-test.before((t) => {
+beforeAll(() => {
   const tracerProvider = new BasicTracerProvider()
   const success = trace.setGlobalTracerProvider(tracerProvider)
-  t.true(success)
+  expect(success).toBe(true)
 })
 
-test.after(() => {
+afterAll(() => {
   trace.disable()
 })
 
-test.beforeEach((t) => {
+beforeEach(() => {
   const tracer = trace.getTracer('test')
   const span = tracer.startSpan('my-span')
   const ctx = trace.setSpan(ROOT_CONTEXT, span)
   const success = context.setGlobalContextManager(createContextManager(ctx))
-  t.true(success)
+  expect(success).toBe(true)
 })
 
-test.afterEach(() => {
+afterEach(() => {
   context.disable()
 })
 
-test.serial('addBuildErrorToActiveSpan - when error severity info', async (t) => {
+test.sequential('addBuildErrorToActiveSpan - when error severity info', async () => {
   const myError = new Error()
   addErrorInfo(myError, { type: 'failPlugin' })
 
   addBuildErrorToActiveSpan(myError)
   const span = trace.getActiveSpan()
-  t.is(span.status.code, SpanStatusCode.ERROR)
+  expect(span.status.code).toBe(SpanStatusCode.ERROR)
   // Severities are infered from the Error Type
-  t.deepEqual(span.attributes, {
+  expect(span.attributes).toEqual({
     'build.error.location.type': 'buildFail',
     'build.error.severity': 'info',
     'build.error.type': 'failPlugin',
   })
 })
 
-test.serial('addBuildErrorToActiveSpan - when error has no info', async (t) => {
+test.sequential('addBuildErrorToActiveSpan - when error has no info', async () => {
   const myError = new Error()
   addBuildErrorToActiveSpan(myError)
 
   const span = trace.getActiveSpan()
-  t.is(span.status.code, SpanStatusCode.ERROR)
+  expect(span.status.code).toBe(SpanStatusCode.ERROR)
   // If we have no custom build error Info nothing is added to the span attributes
-  t.deepEqual(span.attributes, {})
+  expect(span.attributes).toEqual({})
 })
 
-test.serial('addBuildErrorToActiveSpan - noop when error severity none', async (t) => {
+test.sequential('addBuildErrorToActiveSpan - noop when error severity none', async () => {
   const myError = new Error()
   addErrorInfo(myError, { type: 'cancelBuild' })
 
   const span = trace.getActiveSpan()
   addBuildErrorToActiveSpan(myError)
 
-  t.deepEqual(span.attributes, {})
-  t.is(span.status.code, SpanStatusCode.UNSET)
+  expect(span.attributes).toEqual({})
+  expect(span.status.code).toBe(SpanStatusCode.UNSET)
 })

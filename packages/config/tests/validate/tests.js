@@ -1,332 +1,332 @@
 import { Fixture, normalizeOutput } from '@netlify/testing'
-import test from 'ava'
+import { test, expect } from 'vitest'
 
-test('plugins: not array', async (t) => {
+test('plugins: not array', async () => {
   const output = await new Fixture('./fixtures/plugins_not_array').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('plugins: not array of objects', async (t) => {
+test('plugins: not array of objects', async () => {
   const output = await new Fixture('./fixtures/plugins_not_objects').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('plugins: do not allow duplicates', async (t) => {
+test('plugins: do not allow duplicates', async () => {
   const output = await new Fixture('./fixtures/plugins_duplicate').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('plugins: do not allow duplicates in the UI', async (t) => {
+test('plugins: do not allow duplicates in the UI', async () => {
   const output = await new Fixture('./fixtures/empty')
     .withFlags({ defaultConfig: { plugins: [{ package: 'test' }, { package: 'test' }] } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('plugins.any: unknown property', async (t) => {
+test('plugins.any: unknown property', async () => {
   const output = await new Fixture('./fixtures/plugins_unknown').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('plugins.any.id backward compatibility', async (t) => {
+test('plugins.any.id backward compatibility', async () => {
   const output = await new Fixture('./fixtures/plugins_id_compat').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('plugins.any.enabled removed', async (t) => {
+test('plugins.any.enabled removed', async () => {
   const output = await new Fixture('./fixtures/plugins_enabled').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('plugins.any.package: required', async (t) => {
+test('plugins.any.package: required', async () => {
   const output = await new Fixture('./fixtures/plugins_package_required').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('plugins.any.package: string', async (t) => {
+test('plugins.any.package: string', async () => {
   const output = await new Fixture('./fixtures/plugins_package_string').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('plugins.any.package: should not include a version', async (t) => {
+test('plugins.any.package: should not include a version', async () => {
   const output = await new Fixture('./fixtures/plugins_package_version').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('plugins.any.package: should not include a URI scheme', async (t) => {
+test('plugins.any.package: should not include a URI scheme', async () => {
   const output = await new Fixture('./fixtures/plugins_package_scheme').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('plugins.any.pinned_version: string', async (t) => {
+test('plugins.any.pinned_version: string', async () => {
   const output = await new Fixture('./fixtures/plugins_pinned_version_string').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('plugins.any.inputs: object', async (t) => {
+test('plugins.any.inputs: object', async () => {
   const output = await new Fixture('./fixtures/plugins_inputs_object').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build: object', async (t) => {
+test('build: object', async () => {
   const output = await new Fixture('./fixtures/build_object').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.publish: string', async (t) => {
+test('build.publish: string', async () => {
   const output = await new Fixture('./fixtures/build_publish_string').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.publish: parent directory', async (t) => {
+test('build.publish: parent directory', async () => {
   const output = await new Fixture('./fixtures/build_publish_parent').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.publish: can be outside of build directory', async (t) => {
+test('build.publish: can be outside of build directory', async () => {
   const output = await new Fixture('./fixtures/build_publish_parent_build').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.publish: cannot be outside of root repository', async (t) => {
+test('build.publish: cannot be outside of root repository', async () => {
   const output = await new Fixture('./fixtures/build_publish_parent_root').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.functions: string', async (t) => {
+test('build.functions: string', async () => {
   const output = await new Fixture('./fixtures/build_functions_string').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.functions: parent directory', async (t) => {
+test('build.functions: parent directory', async () => {
   const output = await new Fixture('./fixtures/build_functions_parent').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.edge_functions: string', async (t) => {
+test('build.edge_functions: string', async () => {
   const output = await new Fixture('./fixtures/build_edge_functions_string').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.edge_functions: parent directory', async (t) => {
+test('build.edge_functions: parent directory', async () => {
   const output = await new Fixture('./fixtures/build_edge_functions_parent').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.base: string', async (t) => {
+test('build.base: string', async () => {
   const output = await new Fixture('./fixtures/build_base_string').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.base: parent directory', async (t) => {
+test('build.base: parent directory', async () => {
   const output = await new Fixture('./fixtures/build_base_parent').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.command: string', async (t) => {
+test('build.command: string', async () => {
   const output = await new Fixture('./fixtures/build_command_string').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.command: array', async (t) => {
+test('build.command: array', async () => {
   const output = await new Fixture('./fixtures/build_command_array').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.command is validated even when not used due to merging', async (t) => {
+test('build.command is validated even when not used due to merging', async () => {
   const output = await new Fixture('./fixtures/build_command_merge')
     .withFlags({ defaultConfig: { build: { command: false } } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.context: property', async (t) => {
+test('build.context: property', async () => {
   const output = await new Fixture('./fixtures/build_context_property')
     .withFlags({ context: 'development' })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.context: nested property', async (t) => {
+test('build.context: nested property', async () => {
   const output = await new Fixture('./fixtures/build_context_nested_property')
     .withFlags({ context: 'development' })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.context: object', async (t) => {
+test('build.context: object', async () => {
   const output = await new Fixture('./fixtures/build_context_object').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.context.CONTEXT: object', async (t) => {
+test('build.context.CONTEXT: object', async () => {
   const output = await new Fixture('./fixtures/build_context_nested_object').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.context properties are validated like top-level ones', async (t) => {
+test('build.context properties are validated like top-level ones', async () => {
   const output = await new Fixture('./fixtures/build_context_validation').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('build.context properties are validated like top-level ones even on different context', async (t) => {
+test('build.context properties are validated like top-level ones even on different context', async () => {
   const output = await new Fixture('./fixtures/build_context_validation')
     .withFlags({ context: 'development' })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Warns when using UI plugins together with context-specific plugin configuration', async (t) => {
+test('Warns when using UI plugins together with context-specific plugin configuration', async () => {
   const output = await new Fixture('./fixtures/build_context_plugins_warn')
     .withFlags({ defaultConfig: { plugins: [{ package: 'netlify-plugin-test' }] } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Does not warn when using context-free plugin configuration together with context-specific plugin configuration', async (t) => {
+test('Does not warn when using context-free plugin configuration together with context-specific plugin configuration', async () => {
   const output = await new Fixture('./fixtures/build_context_plugins_nowarn_global').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Does not warn when using no context-free plugin configuration together with context-specific plugin configuration', async (t) => {
+test('Does not warn when using no context-free plugin configuration together with context-specific plugin configuration', async () => {
   const output = await new Fixture('./fixtures/build_context_plugins_nowarn_none').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Throws when using UI plugins together with context-specific plugin configuration in a different context', async (t) => {
+test('Throws when using UI plugins together with context-specific plugin configuration in a different context', async () => {
   const output = await new Fixture('./fixtures/build_context_plugins_warn')
     .withFlags({ context: 'development', defaultConfig: { plugins: [{ package: 'netlify-plugin-test' }] } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Does not throw when using UI plugins together with context-specific plugin configuration in a different context but with inputs', async (t) => {
+test('Does not throw when using UI plugins together with context-specific plugin configuration in a different context but with inputs', async () => {
   const output = await new Fixture('./fixtures/build_context_plugins_warn_inputs')
     .withFlags({ context: 'development', defaultConfig: { plugins: [{ package: 'netlify-plugin-test' }] } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('functions: object', async (t) => {
+test('functions: object', async () => {
   const output = await new Fixture('./fixtures/function_config_invalid_root').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('functions block: object', async (t) => {
+test('functions block: object', async () => {
   const output = await new Fixture('./fixtures/function_config_invalid_function_block').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('functions.external_node_modules: array of strings', async (t) => {
+test('functions.external_node_modules: array of strings', async () => {
   const output = await new Fixture('./fixtures/function_config_invalid_external_modules').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('functions.included_files: is array of strings', async (t) => {
+test('functions.included_files: is array of strings', async () => {
   const output = await new Fixture('./fixtures/function_config_invalid_included_files').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('functions.ignored_node_modules: array of strings', async (t) => {
+test('functions.ignored_node_modules: array of strings', async () => {
   const output = await new Fixture('./fixtures/function_config_invalid_ignored_modules').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('functions.node_bundler: one of supported bundlers', async (t) => {
+test('functions.node_bundler: one of supported bundlers', async () => {
   const output = await new Fixture('./fixtures/function_config_invalid_node_bundler').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('functions.directory: defined on the main functions object', async (t) => {
+test('functions.directory: defined on the main functions object', async () => {
   const output = await new Fixture('./fixtures/function_config_invalid_nested_directory').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('functions.deno_import_map: string', async (t) => {
+test('functions.deno_import_map: string', async () => {
   const output = await new Fixture('./fixtures/functions_deno_import_map').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Validates defaultConfig', async (t) => {
+test('Validates defaultConfig', async () => {
   const output = await new Fixture('./fixtures/empty')
     .withFlags({ defaultConfig: { build: { command: false } } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Validates inlineConfig', async (t) => {
+test('Validates inlineConfig', async () => {
   const output = await new Fixture('./fixtures/empty')
     .withFlags({ inlineConfig: { build: { command: false } } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions: not array', async (t) => {
+test('edge_functions: not array', async () => {
   const output = await new Fixture('./fixtures/edge_functions_not_array').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions: not array of objects', async (t) => {
+test('edge_functions: not array of objects', async () => {
   const output = await new Fixture('./fixtures/edge_functions_not_array_of_objects').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions.any: unknown properties', async (t) => {
+test('edge_functions.any: unknown properties', async () => {
   const output = await new Fixture('./fixtures/edge_functions_unknown_props').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions.any: missing properties', async (t) => {
+test('edge_functions.any: missing properties', async () => {
   const output = await new Fixture('./fixtures/edge_functions_missing_props').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions.any.path: invalid path', async (t) => {
+test('edge_functions.any.path: invalid path', async () => {
   const output = await new Fixture('./fixtures/edge_functions_invalid_path').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions.any.excludedPath: invalid path', async (t) => {
+test('edge_functions.any.excludedPath: invalid path', async () => {
   const output = await new Fixture('./fixtures/edge_functions_excluded_path_invalid').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions.any.test: pattern and path are exclusive', async (t) => {
+test('edge_functions.any.test: pattern and path are exclusive', async () => {
   const output = await new Fixture('./fixtures/edge_functions_pattern_path_exclusive').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions.any.test: excludedPattern and excludedPath are exclusive', async (t) => {
+test('edge_functions.any.test: excludedPattern and excludedPath are exclusive', async () => {
   const output = await new Fixture('./fixtures/edge_functions_excluded_pattern_path_exclusive').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions.any.function: not a string', async (t) => {
+test('edge_functions.any.function: not a string', async () => {
   const output = await new Fixture('./fixtures/edge_functions_not_a_string').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions.any.mode: allowed values', async (t) => {
+test('edge_functions.any.mode: allowed values', async () => {
   const output = await new Fixture('./fixtures/edge_functions_mode_allowed').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions.any.mode: disallowed values', async (t) => {
+test('edge_functions.any.mode: disallowed values', async () => {
   const output = await new Fixture('./fixtures/edge_functions_mode_disallowed').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions.any.method: disallowed values', async (t) => {
+test('edge_functions.any.method: disallowed values', async () => {
   const output = await new Fixture('./fixtures/edge_functions_method_disallowed').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions.any.header: allowed values', async (t) => {
+test('edge_functions.any.header: allowed values', async () => {
   const output = await new Fixture('./fixtures/edge_functions_header_allowed').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('edge_functions.any.header: disallowed values', async (t) => {
+test('edge_functions.any.header: disallowed values', async () => {
   const output = await new Fixture('./fixtures/edge_functions_header_disallowed').runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })

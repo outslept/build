@@ -1,25 +1,25 @@
 import { Fixture, normalizeOutput } from '@netlify/testing'
-import test from 'ava'
 import hasAnsi from 'has-ansi'
+import { test, expect } from 'vitest'
 
-test('Prints some information in debug mode', async (t) => {
+test('Prints some information in debug mode', async () => {
   const output = await new Fixture('./fixtures/simple').withFlags({ debug: true }).runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Allow printing undefined in debug mode', async (t) => {
+test('Allow printing undefined in debug mode', async () => {
   const output = await new Fixture('./fixtures/empty').withFlags({ debug: true }).runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Allow printing plugins with no inputs in debug mode', async (t) => {
+test('Allow printing plugins with no inputs in debug mode', async () => {
   const output = await new Fixture('./fixtures/empty')
     .withFlags({ debug: true, defaultConfig: { plugins: [{ package: 'test' }] } })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Does not print confidential information in debug mode', async (t) => {
+test('Does not print confidential information in debug mode', async () => {
   const output = await new Fixture('./fixtures/simple')
     .withFlags({
       debug: true,
@@ -28,24 +28,24 @@ test('Does not print confidential information in debug mode', async (t) => {
     })
     .withEnv({ SECRET: 'true' })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Debug mode can be enabled using the NETLIFY_BUILD_DEBUG environment variable', async (t) => {
+test('Debug mode can be enabled using the NETLIFY_BUILD_DEBUG environment variable', async () => {
   const output = await new Fixture('./fixtures/simple').withEnv({ NETLIFY_BUILD_DEBUG: 'true' }).runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Debug mode can be enabled using the NETLIFY_BUILD_DEBUG environment UI setting', async (t) => {
+test('Debug mode can be enabled using the NETLIFY_BUILD_DEBUG environment UI setting', async () => {
   const output = await new Fixture('./fixtures/simple')
     .withFlags({
       defaultConfig: { build: { environment: { NETLIFY_BUILD_DEBUG: 'true' } } },
     })
     .runWithConfig()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Prints colors', async (t) => {
+test('Prints colors', async () => {
   const {
     logs: { stderr },
   } = await new Fixture('./fixtures/simple')
@@ -53,5 +53,5 @@ test('Prints colors', async (t) => {
     .withEnv({ FORCE_COLOR: '1' })
     .runConfigBinaryAsObject()
 
-  t.true(hasAnsi(stderr.join('\n')))
+  expect(hasAnsi(stderr.join('\n'))).toBe(true)
 })
