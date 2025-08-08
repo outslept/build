@@ -1,0 +1,646 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`build plugins can manipulate netlifyToml.edge_functions array 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/functions_plugin_mutations
+
+> Config file
+  packages/build/tests/edge_functions/fixtures/functions_plugin_mutations/netlify.toml
+
+> Context
+  production
+
+> Loading plugins
+   - ./plugin.js@1.0.0 from netlify.toml
+
+./plugin.js (onPreBuild event)                                
+────────────────────────────────────────────────────────────────
+
+Netlify configuration property "edge_functions" value changed to [ { path: '/external/path', function: 'mutated-function' } ].
+
+(./plugin.js onPreBuild completed in 1ms)
+
+Edge Functions bundling                                       
+────────────────────────────────────────────────────────────────
+
+Packaging Edge Functions from .netlify/edge-functions directory:
+ - mutated-function
+
+(Edge Functions bundling completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`builds Edge Functions from both the user and the internal directories 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/functions_user_internal
+
+> Config file
+  No config file was defined: using default values.
+
+> Context
+  production
+
+Edge Functions bundling                                       
+────────────────────────────────────────────────────────────────
+
+Packaging Edge Functions from .netlify/edge-functions directory:
+ - function-2
+
+Packaging Edge Functions from netlify/edge-functions directory:
+ - function-1
+
+(Edge Functions bundling completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`builds Edge Functions from the internal directory 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/functions_internal
+
+> Config file
+  No config file was defined: using default values.
+
+> Context
+  production
+
+Edge Functions bundling                                       
+────────────────────────────────────────────────────────────────
+
+Packaging Edge Functions from .netlify/edge-functions directory:
+ - function-1
+
+(Edge Functions bundling completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`builds Edge Functions from the user-defined directory 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/functions_user
+
+> Config file
+  packages/build/tests/edge_functions/fixtures/functions_user/netlify.toml
+
+> Context
+  production
+
+Edge Functions bundling                                       
+────────────────────────────────────────────────────────────────
+
+Packaging Edge Functions from netlify/edge-functions directory:
+ - function-1
+
+(Edge Functions bundling completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`builds both edge functions generated with the Frameworks API and the ones in the internal directory 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/functions_user_internal_framework
+
+> Config file
+  packages/build/tests/edge_functions/fixtures/functions_user_internal_framework/netlify.toml
+
+> Context
+  production
+
+build.command from netlify.toml                               
+────────────────────────────────────────────────────────────────
+
+$ node build.mjs
+
+(build.command completed in 1ms)
+
+Edge Functions bundling                                       
+────────────────────────────────────────────────────────────────
+
+Packaging Edge Functions from .netlify/edge-functions directory:
+ - frameworks-internal-conflict
+ - function-3
+
+Packaging Edge Functions generated by your framework:
+ - frameworks-internal-conflict
+ - frameworks-user-conflict
+ - function-2
+
+Packaging Edge Functions from netlify/edge-functions directory:
+ - frameworks-user-conflict
+ - function-1
+
+(Edge Functions bundling completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`builds edge functions generated with the Frameworks API 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/functions_user_framework
+
+> Config file
+  packages/build/tests/edge_functions/fixtures/functions_user_framework/netlify.toml
+
+> Context
+  production
+
+build.command from netlify.toml                               
+────────────────────────────────────────────────────────────────
+
+$ node build.mjs
+
+(build.command completed in 1ms)
+
+Edge Functions bundling                                       
+────────────────────────────────────────────────────────────────
+
+Packaging Edge Functions generated by your framework:
+ - function-2
+
+Packaging Edge Functions from netlify/edge-functions directory:
+ - function-1
+
+(Edge Functions bundling completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`bundles Edge Functions via runCoreSteps function 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  buildSteps:
+    - edge_functions_bundling
+  debug: false
+  useRunCoreSteps: true
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/functions_user
+
+> Config file
+  packages/build/tests/edge_functions/fixtures/functions_user/netlify.toml
+
+> Context
+  production
+
+Edge Functions bundling                                       
+────────────────────────────────────────────────────────────────
+
+Packaging Edge Functions from netlify/edge-functions directory:
+ - function-1
+
+(Edge Functions bundling completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`constants.EDGE_FUNCTIONS_DIST custom value 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/print_dist
+
+> Config file
+  packages/build/tests/edge_functions/fixtures/print_dist/netlify.toml
+
+> Context
+  production
+
+> Loading plugins
+   - ./plugin@1.0.0 from netlify.toml
+
+./plugin (onPreBuild event)                                   
+────────────────────────────────────────────────────────────────
+
+/external/path
+
+(./plugin onPreBuild completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`constants.EDGE_FUNCTIONS_DIST default value 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/print_dist
+
+> Config file
+  packages/build/tests/edge_functions/fixtures/print_dist/netlify.toml
+
+> Context
+  production
+
+> Loading plugins
+   - ./plugin@1.0.0 from netlify.toml
+
+./plugin (onPreBuild event)                                   
+────────────────────────────────────────────────────────────────
+
+.netlify/edge-functions-dist/
+
+(./plugin onPreBuild completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`constants.EDGE_FUNCTIONS_SRC automatic value 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/src_auto
+
+> Config file
+  packages/build/tests/edge_functions/fixtures/src_auto/netlify.toml
+
+> Context
+  production
+
+> Loading plugins
+   - ./plugin@1.0.0 from netlify.toml
+
+./plugin (onPreBuild event)                                   
+────────────────────────────────────────────────────────────────
+
+netlify/edge-functions
+
+(./plugin onPreBuild completed in 1ms)
+
+Edge Functions bundling                                       
+────────────────────────────────────────────────────────────────
+
+No Edge Functions were found in netlify/edge-functions directory
+
+(Edge Functions bundling completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`constants.EDGE_FUNCTIONS_SRC created dynamically 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  /tmp-dir
+
+> Config file
+  /tmp-dir/netlify.toml
+
+> Context
+  production
+
+> Loading plugins
+   - ./plugin from netlify.toml
+
+./plugin (onPreBuild event)                                   
+────────────────────────────────────────────────────────────────
+
+true
+
+(./plugin onPreBuild completed in 1ms)
+
+./plugin (onBuild event)                                      
+────────────────────────────────────────────────────────────────
+
+netlify/edge-functions
+
+(./plugin onBuild completed in 1ms)
+
+./plugin (onPostBuild event)                                  
+────────────────────────────────────────────────────────────────
+
+true
+
+(./plugin onPostBuild completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`constants.EDGE_FUNCTIONS_SRC default value 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/src_default
+
+> Config file
+  packages/build/tests/edge_functions/fixtures/src_default/netlify.toml
+
+> Context
+  production
+
+> Loading plugins
+   - ./plugin@1.0.0 from netlify.toml
+
+./plugin (onPreBuild event)                                   
+────────────────────────────────────────────────────────────────
+
+undefined
+
+(./plugin onPreBuild completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`constants.EDGE_FUNCTIONS_SRC dynamic is ignored if EDGE_FUNCTIONS_SRC is specified 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  /tmp-dir
+
+> Config file
+  /tmp-dir/netlify.toml
+
+> Context
+  production
+
+> Loading plugins
+   - ./plugin from netlify.toml
+
+./plugin (onPreBuild event)                                   
+────────────────────────────────────────────────────────────────
+
+true
+
+(./plugin onPreBuild completed in 1ms)
+
+./plugin (onBuild event)                                      
+────────────────────────────────────────────────────────────────
+
+true
+
+(./plugin onBuild completed in 1ms)
+
+Edge Functions bundling                                       
+────────────────────────────────────────────────────────────────
+
+No Edge Functions were found in test directory
+
+(Edge Functions bundling completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`constants.EDGE_FUNCTIONS_SRC missing path 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/src_missing
+
+> Config file
+  packages/build/tests/edge_functions/fixtures/src_missing/netlify.toml
+
+> Context
+  production
+
+> Loading plugins
+   - ./plugin@1.0.0 from netlify.toml
+
+./plugin (onPreBuild event)                                   
+────────────────────────────────────────────────────────────────
+
+missing false
+
+(./plugin onPreBuild completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`constants.EDGE_FUNCTIONS_SRC relative path 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/src_relative
+
+> Config file
+  packages/build/tests/edge_functions/fixtures/src_relative/netlify.toml
+
+> Context
+  production
+
+> Loading plugins
+   - ./plugin@1.0.0 from netlify.toml
+
+./plugin (onPreBuild event)                                   
+────────────────────────────────────────────────────────────────
+
+custom-edge-functions
+
+(./plugin onPreBuild completed in 1ms)
+
+Edge Functions bundling                                       
+────────────────────────────────────────────────────────────────
+
+No Edge Functions were found in custom-edge-functions directory
+
+(Edge Functions bundling completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;
+
+exports[`writes manifest contents to system logs if \`systemLogFile\` is set 1`] = `
+"
+Netlify Build                                                 
+────────────────────────────────────────────────────────────────
+
+> Version
+  @netlify/build 1.0.0
+
+> Flags
+  debug: false
+
+> Current directory
+  packages/build/tests/edge_functions/fixtures/functions_user
+
+> Config file
+  packages/build/tests/edge_functions/fixtures/functions_user/netlify.toml
+
+> Context
+  production
+
+Edge Functions bundling                                       
+────────────────────────────────────────────────────────────────
+
+Packaging Edge Functions from netlify/edge-functions directory:
+ - function-1
+
+(Edge Functions bundling completed in 1ms)
+
+Netlify Build Complete                                        
+────────────────────────────────────────────────────────────────
+
+(Netlify Build completed in 1ms)"
+`;

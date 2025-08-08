@@ -50,16 +50,16 @@ test('Should redirect stdout/stderr to parent', async () => {
 })
 
 test('Should not redirect stdout/stderr to parent when using "stdio" option', async () => {
-  const { stdout } = await runInChildProcess('ava --version', { stdio: 'pipe' })
+  const { stdout } = await runInChildProcess('node --version', { stdio: 'pipe' })
   expect(stdout).toBe('')
 })
 
 test('Should not redirect stdout/stderr to parent when using "stdout" option', async () => {
-  const { stdout } = await runInChildProcess('ava --version', { stdout: 'pipe' })
+  const { stdout } = await runInChildProcess('node --version', { stdout: 'pipe' })
   expect(stdout).toBe('')
 })
 
 test('Should not redirect stdout/stderr to parent when using "stderr" option', async () => {
-  const { stdout } = await runInChildProcess('ava --version', { stderr: 'pipe' })
+  const { stdout } = await runInChildProcess('node --version', { stderr: 'pipe' })
   expect(stdout).toBe('')
 })

@@ -1,5 +1,5 @@
 import { Fixture } from '@netlify/testing'
-import test from 'ava'
+import { test, expect } from 'vitest'
 
 // List of API endpoints to mock
 const SITE_INFO_PATH = '/api/v1/sites/test'
@@ -120,185 +120,185 @@ const isDefinedString = function (string) {
   return typeof string === 'string' && string.trim().length !== 0
 }
 
-test('Does not set environment variable in the buildbot', async (t) => {
+test('Does not set environment variable in the buildbot', async () => {
   const { env } = await new Fixture('./fixtures/empty').withFlags({ mode: 'buildbot' }).runWithConfigAsObject()
-  t.is(Object.keys(env).length, 0)
+  expect(Object.keys(env).length).toBe(0)
 })
 
-test('Sets LANG environment variable', async (t) => {
+test('Sets LANG environment variable', async () => {
   const {
     env: { LANG },
   } = await new Fixture('./fixtures/empty').runWithConfigAsObject()
-  t.deepEqual(LANG.sources, ['general'])
-  t.true(isDefinedString(LANG.value))
+  expect(LANG.sources).toEqual(['general'])
+  expect(isDefinedString(LANG.value)).toBe(true)
 })
 
-test('Sets LANGUAGE environment variable', async (t) => {
+test('Sets LANGUAGE environment variable', async () => {
   const {
     env: { LANGUAGE },
   } = await new Fixture('./fixtures/empty').runWithConfigAsObject()
-  t.deepEqual(LANGUAGE.sources, ['general'])
-  t.true(isDefinedString(LANGUAGE.value))
+  expect(LANGUAGE.sources).toEqual(['general'])
+  expect(isDefinedString(LANGUAGE.value)).toBe(true)
 })
 
-test('Sets LC_ALL environment variable', async (t) => {
+test('Sets LC_ALL environment variable', async () => {
   const {
     env: { LC_ALL },
   } = await new Fixture('./fixtures/empty').runWithConfigAsObject()
-  t.deepEqual(LC_ALL.sources, ['general'])
-  t.true(isDefinedString(LC_ALL.value))
+  expect(LC_ALL.sources).toEqual(['general'])
+  expect(isDefinedString(LC_ALL.value)).toBe(true)
 })
 
-test('Sets GATSBY_TELEMETRY_DISABLED environment variable', async (t) => {
+test('Sets GATSBY_TELEMETRY_DISABLED environment variable', async () => {
   const {
     env: { GATSBY_TELEMETRY_DISABLED },
   } = await new Fixture('./fixtures/empty').runWithConfigAsObject()
-  t.deepEqual(GATSBY_TELEMETRY_DISABLED.sources, ['general'])
-  t.true(isDefinedString(GATSBY_TELEMETRY_DISABLED.value))
+  expect(GATSBY_TELEMETRY_DISABLED.sources).toEqual(['general'])
+  expect(isDefinedString(GATSBY_TELEMETRY_DISABLED.value)).toBe(true)
 })
 
-test('Sets NEXT_TELEMETRY_DISABLED environment variable', async (t) => {
+test('Sets NEXT_TELEMETRY_DISABLED environment variable', async () => {
   const {
     env: { NEXT_TELEMETRY_DISABLED },
   } = await new Fixture('./fixtures/empty').runWithConfigAsObject()
-  t.deepEqual(NEXT_TELEMETRY_DISABLED.sources, ['general'])
-  t.true(isDefinedString(NEXT_TELEMETRY_DISABLED.value))
+  expect(NEXT_TELEMETRY_DISABLED.sources).toEqual(['general'])
+  expect(isDefinedString(NEXT_TELEMETRY_DISABLED.value)).toBe(true)
 })
 
-test('Sets PULL_REQUEST environment variable', async (t) => {
+test('Sets PULL_REQUEST environment variable', async () => {
   const {
     env: { PULL_REQUEST },
   } = await new Fixture('./fixtures/empty').runWithConfigAsObject()
-  t.deepEqual(PULL_REQUEST.sources, ['general'])
-  t.true(isDefinedString(PULL_REQUEST.value))
+  expect(PULL_REQUEST.sources).toEqual(['general'])
+  expect(isDefinedString(PULL_REQUEST.value)).toBe(true)
 })
 
-test('Sets COMMIT_REF environment variable', async (t) => {
+test('Sets COMMIT_REF environment variable', async () => {
   const {
     env: { COMMIT_REF },
   } = await new Fixture('./fixtures/empty').runWithConfigAsObject()
-  t.deepEqual(COMMIT_REF.sources, ['general'])
-  t.true(isDefinedString(COMMIT_REF.value))
+  expect(COMMIT_REF.sources).toEqual(['general'])
+  expect(isDefinedString(COMMIT_REF.value)).toBe(true)
 })
 
-test('Sets CACHED_COMMIT_REF environment variable', async (t) => {
+test('Sets CACHED_COMMIT_REF environment variable', async () => {
   const {
     env: { CACHED_COMMIT_REF },
   } = await new Fixture('./fixtures/empty').runWithConfigAsObject()
-  t.deepEqual(CACHED_COMMIT_REF.sources, ['general'])
-  t.true(isDefinedString(CACHED_COMMIT_REF.value))
+  expect(CACHED_COMMIT_REF.sources).toEqual(['general'])
+  expect(isDefinedString(CACHED_COMMIT_REF.value)).toBe(true)
 })
 
-test('Sets HEAD environment variable', async (t) => {
+test('Sets HEAD environment variable', async () => {
   const {
     env: { HEAD },
   } = await new Fixture('./fixtures/empty').runWithConfigAsObject()
-  t.deepEqual(HEAD.sources, ['general'])
-  t.true(isDefinedString(HEAD.value))
+  expect(HEAD.sources).toEqual(['general'])
+  expect(isDefinedString(HEAD.value)).toBe(true)
 })
 
-test('Sets BRANCH environment variable', async (t) => {
+test('Sets BRANCH environment variable', async () => {
   const {
     env: { BRANCH },
   } = await new Fixture('./fixtures/empty').withFlags({ branch: 'test' }).runWithConfigAsObject()
-  t.deepEqual(BRANCH.sources, ['general'])
-  t.is(BRANCH.value, 'test')
+  expect(BRANCH.sources).toEqual(['general'])
+  expect(BRANCH.value).toBe('test')
 })
 
-test('Does not set some git-related environment variables if no repository', async (t) => {
+test('Does not set some git-related environment variables if no repository', async () => {
   const {
     env: { COMMIT_REF },
   } = await new Fixture('./fixtures/empty')
     .withCopyRoot({ git: false })
     .then((fixture) => fixture.runWithConfigAsObject())
-  t.is(COMMIT_REF, undefined)
+  expect(COMMIT_REF).toBe(undefined)
 })
 
-test('Sets CONTEXT environment variable', async (t) => {
+test('Sets CONTEXT environment variable', async () => {
   const {
     env: { CONTEXT },
   } = await new Fixture('./fixtures/empty').withFlags({ context: 'test' }).runWithConfigAsObject()
-  t.deepEqual(CONTEXT.sources, ['general'])
-  t.is(CONTEXT.value, 'test')
+  expect(CONTEXT.sources).toEqual(['general'])
+  expect(CONTEXT.value).toBe('test')
 })
 
-test('Sets DEPLOY_ID environment variable', async (t) => {
+test('Sets DEPLOY_ID environment variable', async () => {
   const {
     env: { DEPLOY_ID },
   } = await new Fixture('./fixtures/empty').withFlags({ deployId: 'test' }).runWithConfigAsObject()
-  t.deepEqual(DEPLOY_ID.sources, ['general'])
-  t.is(DEPLOY_ID.value, 'test')
+  expect(DEPLOY_ID.sources).toEqual(['general'])
+  expect(DEPLOY_ID.value).toBe('test')
 })
 
-test('Sets default DEPLOY_ID environment variable', async (t) => {
+test('Sets default DEPLOY_ID environment variable', async () => {
   const {
     env: { DEPLOY_ID },
   } = await new Fixture('./fixtures/empty').runWithConfigAsObject()
-  t.deepEqual(DEPLOY_ID.sources, ['general'])
-  t.is(DEPLOY_ID.value, '0')
+  expect(DEPLOY_ID.sources).toEqual(['general'])
+  expect(DEPLOY_ID.value).toBe('0')
 })
 
-test('Sets BUILD_ID environment variable', async (t) => {
+test('Sets BUILD_ID environment variable', async () => {
   const {
     env: { BUILD_ID },
   } = await new Fixture('./fixtures/empty').withFlags({ buildId: 'test-build' }).runWithConfigAsObject()
-  t.deepEqual(BUILD_ID.sources, ['general'])
-  t.is(BUILD_ID.value, 'test-build')
+  expect(BUILD_ID.sources).toEqual(['general'])
+  expect(BUILD_ID.value).toBe('test-build')
 })
 
-test('Sets default BUILD_ID environment variable', async (t) => {
+test('Sets default BUILD_ID environment variable', async () => {
   const {
     env: { BUILD_ID },
   } = await new Fixture('./fixtures/empty').runWithConfigAsObject()
-  t.deepEqual(BUILD_ID.sources, ['general'])
-  t.is(BUILD_ID.value, '0')
+  expect(BUILD_ID.sources).toEqual(['general'])
+  expect(BUILD_ID.value).toBe('0')
 })
 
-test('Sets SITE_ID environment variable', async (t) => {
+test('Sets SITE_ID environment variable', async () => {
   const {
     env: { SITE_ID },
   } = await new Fixture('./fixtures/empty').withFlags({ siteId: 'test' }).runWithConfigAsObject()
-  t.deepEqual(SITE_ID.sources, ['general'])
-  t.is(SITE_ID.value, 'test')
+  expect(SITE_ID.sources).toEqual(['general'])
+  expect(SITE_ID.value).toBe('test')
 })
 
-test('Does not set SITE_ID environment variable if no flag is provided', async (t) => {
+test('Does not set SITE_ID environment variable if no flag is provided', async () => {
   const {
     env: { SITE_ID },
   } = await new Fixture('./fixtures/empty').runWithConfigAsObject()
-  t.is(SITE_ID, undefined)
+  expect(SITE_ID).toBe(undefined)
 })
 
-test('Sets SITE_NAME environment variable', async (t) => {
+test('Sets SITE_NAME environment variable', async () => {
   const {
     env: { SITE_NAME },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS)
     .runConfigServerAsObject([SITE_INFO_RESPONSE_NAME, SITE_EXTENSIONS_EMPTY_RESPONSE])
-  t.deepEqual(SITE_NAME.sources, ['general'])
-  t.is(SITE_NAME.value, 'test-name')
+  expect(SITE_NAME.sources).toEqual(['general'])
+  expect(SITE_NAME.value).toBe('test-name')
 })
 
-test('Does not set SITE_NAME environment variable if offline', async (t) => {
+test('Does not set SITE_NAME environment variable if offline', async () => {
   const {
     env: { SITE_NAME },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS_OFFLINE)
     .runConfigServerAsObject(SITE_INFO_RESPONSE_ENV)
-  t.is(SITE_NAME, undefined)
+  expect(SITE_NAME).toBe(undefined)
 })
 
-test('Sets URL environment variable', async (t) => {
+test('Sets URL environment variable', async () => {
   const {
     env: { URL },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS)
     .runConfigServerAsObject([SITE_INFO_RESPONSE_URL, SITE_EXTENSIONS_EMPTY_RESPONSE])
-  t.deepEqual(URL.sources, ['general'])
-  t.is(URL.value, 'test')
+  expect(URL.sources).toEqual(['general'])
+  expect(URL.value).toBe('test')
 })
 
-test('Sets environment variables when configured to use Envelope', async (t) => {
+test('Sets environment variables when configured to use Envelope', async () => {
   const { env } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS)
     .runConfigServerAsObject([
@@ -307,229 +307,229 @@ test('Sets environment variables when configured to use Envelope', async (t) => 
       TEAM_ENVELOPE_RESPONSE,
       SITE_EXTENSIONS_EMPTY_RESPONSE,
     ])
-  t.deepEqual(env.URL.sources, ['general'])
-  t.is(env.URL.value, 'test')
-  t.is(env.SHARED_ENV_VAR.value, 'ENVELOPE_TEAM_ALL')
-  t.is(env.SITE_ENV_VAR.value, 'ENVELOPE_SITE_PROD')
-  t.is(env.MONGO_ENV_VAR, undefined)
+  expect(env.URL.sources).toEqual(['general'])
+  expect(env.URL.value).toBe('test')
+  expect(env.SHARED_ENV_VAR.value).toBe('ENVELOPE_TEAM_ALL')
+  expect(env.SITE_ENV_VAR.value).toBe('ENVELOPE_SITE_PROD')
+  expect(env.MONGO_ENV_VAR).toBe(undefined)
 })
 
-test('Sets REPOSITORY_URL environment variable', async (t) => {
+test('Sets REPOSITORY_URL environment variable', async () => {
   const {
     env: { REPOSITORY_URL },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS)
     .runConfigServerAsObject([SITE_INFO_RESPONSE_REPO_URL, SITE_EXTENSIONS_EMPTY_RESPONSE])
-  t.deepEqual(REPOSITORY_URL.sources, ['general'])
-  t.is(REPOSITORY_URL.value, 'test')
+  expect(REPOSITORY_URL.sources).toEqual(['general'])
+  expect(REPOSITORY_URL.value).toBe('test')
 })
 
-test('Sets DEPLOY_URL environment variable', async (t) => {
+test('Sets DEPLOY_URL environment variable', async () => {
   const {
     env: { DEPLOY_URL },
   } = await new Fixture('./fixtures/empty')
     .withFlags({ ...AUTH_FLAGS, deployId: 'test' })
     .runConfigServerAsObject([SITE_INFO_RESPONSE_NAME, SITE_EXTENSIONS_EMPTY_RESPONSE])
 
-  t.deepEqual(DEPLOY_URL.sources, ['general'])
-  t.is(DEPLOY_URL.value, `https://test--test-name.netlify.app`)
+  expect(DEPLOY_URL.sources).toEqual(['general'])
+  expect(DEPLOY_URL.value).toBe(`https://test--test-name.netlify.app`)
 })
 
-test('Sets DEPLOY_PRIME_URL environment variable', async (t) => {
+test('Sets DEPLOY_PRIME_URL environment variable', async () => {
   const {
     env: { DEPLOY_PRIME_URL },
   } = await new Fixture('./fixtures/empty')
     .withFlags({ ...AUTH_FLAGS, branch: 'test' })
     .runConfigServerAsObject([SITE_INFO_RESPONSE_NAME, SITE_EXTENSIONS_EMPTY_RESPONSE])
-  t.deepEqual(DEPLOY_PRIME_URL.sources, ['general'])
-  t.is(DEPLOY_PRIME_URL.value, `https://test--test-name.netlify.app`)
+  expect(DEPLOY_PRIME_URL.sources).toEqual(['general'])
+  expect(DEPLOY_PRIME_URL.value).toBe(`https://test--test-name.netlify.app`)
 })
 
-test('Does not set NETLIFY_LOCAL environment variable in production', async (t) => {
+test('Does not set NETLIFY_LOCAL environment variable in production', async () => {
   const {
     env: { NETLIFY_LOCAL },
   } = await new Fixture('./fixtures/empty').withFlags({ mode: 'buildbot' }).runWithConfigAsObject()
-  t.is(NETLIFY_LOCAL, undefined)
+  expect(NETLIFY_LOCAL).toBe(undefined)
 })
 
-test('Sets NETLIFY_LOCAL environment variable in CLI builds', async (t) => {
+test('Sets NETLIFY_LOCAL environment variable in CLI builds', async () => {
   const {
     env: { NETLIFY_LOCAL },
   } = await new Fixture('./fixtures/empty').withFlags({ mode: 'cli' }).runWithConfigAsObject()
-  t.is(NETLIFY_LOCAL.value, 'true')
+  expect(NETLIFY_LOCAL.value).toBe('true')
 })
 
-test('Sets NETLIFY_LOCAL environment variable in programmatic builds', async (t) => {
+test('Sets NETLIFY_LOCAL environment variable in programmatic builds', async () => {
   const {
     env: { NETLIFY_LOCAL },
   } = await new Fixture('./fixtures/empty').withFlags({ mode: 'require' }).runWithConfigAsObject()
-  t.is(NETLIFY_LOCAL.value, 'true')
+  expect(NETLIFY_LOCAL.value).toBe('true')
 })
 
-test('Sets config file environment variables', async (t) => {
+test('Sets config file environment variables', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/file_env').runWithConfigAsObject()
-  t.deepEqual(TEST.sources, ['configFile'])
-  t.is(TEST.value, 'testFile')
+  expect(TEST.sources).toEqual(['configFile'])
+  expect(TEST.value).toBe('testFile')
 })
 
-test('Sets config file empty environment variables', async (t) => {
+test('Sets config file empty environment variables', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/file_env_empty').runWithConfigAsObject()
-  t.deepEqual(TEST.sources, ['configFile'])
-  t.is(TEST.value, '')
+  expect(TEST.sources).toEqual(['configFile'])
+  expect(TEST.value).toBe('')
 })
 
-test('Coerces environment variables to string', async (t) => {
+test('Coerces environment variables to string', async () => {
   const {
     env: { NETLIFY_NEXT_SKIP_PLUGIN, PYTHON_VERSION },
   } = await new Fixture('./fixtures/file_env_not_string').runWithConfigAsObject()
 
-  t.is(PYTHON_VERSION.value, '3.9')
-  t.is(NETLIFY_NEXT_SKIP_PLUGIN.value, 'true')
+  expect(PYTHON_VERSION.value).toBe('3.9')
+  expect(NETLIFY_NEXT_SKIP_PLUGIN.value).toBe('true')
 })
 
-test('Merges all environment variables', async (t) => {
+test('Merges all environment variables', async () => {
   const {
     env: { TEST, LANG },
   } = await new Fixture('./fixtures/file_env')
     .withFlags(AUTH_FLAGS)
     .runConfigServerAsObject([SITE_INFO_RESPONSE_ENV, SITE_EXTENSIONS_EMPTY_RESPONSE])
-  t.deepEqual(TEST.sources, ['configFile', 'ui'])
-  t.is(TEST.value, 'testFile')
-  t.deepEqual(LANG.sources, ['general'])
-  t.true(isDefinedString(LANG.value))
+  expect(TEST.sources).toEqual(['configFile', 'ui'])
+  expect(TEST.value).toBe('testFile')
+  expect(LANG.sources).toEqual(['general'])
+  expect(isDefinedString(LANG.value)).toBe(true)
 })
 
-test('Sets site environment variables', async (t) => {
+test('Sets site environment variables', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS)
     .runConfigServerAsObject([SITE_INFO_RESPONSE_ENV, SITE_EXTENSIONS_EMPTY_RESPONSE])
-  t.deepEqual(TEST.sources, ['ui'])
-  t.is(TEST.value, 'test')
+  expect(TEST.sources).toEqual(['ui'])
+  expect(TEST.value).toBe('test')
 })
 
-test('Does not set site environment variables on API error', async (t) => {
+test('Does not set site environment variables on API error', async () => {
   const { output } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS)
     .runConfigServer(SITE_INFO_RESPONSE_ERROR)
-  t.true(isDefinedString(output))
+  expect(isDefinedString(output)).toBe(true)
 })
 
-test('Does not set site environment variables in the buildbot', async (t) => {
+test('Does not set site environment variables in the buildbot', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS_BUILDBOT)
     .runConfigServerAsObject([SITE_INFO_RESPONSE_ENV, SITE_EXTENSIONS_EMPTY_RESPONSE])
-  t.is(TEST, undefined)
+  expect(TEST).toBe(undefined)
 })
 
-test('Does not set site environment variables if offline', async (t) => {
+test('Does not set site environment variables if offline', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS_OFFLINE)
     .runConfigServerAsObject(SITE_INFO_RESPONSE_ENV)
-  t.is(TEST, undefined)
+  expect(TEST).toBe(undefined)
 })
 
-test('Does not set site environment variables without a siteId', async (t) => {
+test('Does not set site environment variables without a siteId', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS_NO_SITE_ID)
     .runConfigServerAsObject(SITE_INFO_RESPONSE_ENV)
-  t.is(TEST, undefined)
+  expect(TEST).toBe(undefined)
 })
 
-test('Does not set site environment variables without a token', async (t) => {
+test('Does not set site environment variables without a token', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS_NO_TOKEN)
     .runConfigServerAsObject(SITE_INFO_RESPONSE_ENV)
-  t.is(TEST, undefined)
+  expect(TEST).toBe(undefined)
 })
 
-test('Sets accounts environment variables', async (t) => {
+test('Sets accounts environment variables', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS)
     .runConfigServerAsObject([...LIST_ACCOUNTS_RESPONSE_SUCCESS, SITE_EXTENSIONS_EMPTY_RESPONSE])
-  t.deepEqual(TEST.sources, ['account'])
-  t.is(TEST.value, 'test')
+  expect(TEST.sources).toEqual(['account'])
+  expect(TEST.value).toBe('test')
 })
 
-test('Does not set accounts environment variables if no matching account', async (t) => {
+test('Does not set accounts environment variables if no matching account', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS)
     .runConfigServerAsObject([LIST_ACCOUNTS_RESPONSE_MISMATCH, SITE_EXTENSIONS_EMPTY_RESPONSE])
-  t.is(TEST, undefined)
+  expect(TEST).toBe(undefined)
 })
 
-test('Does not set accounts environment variables on API error', async (t) => {
+test('Does not set accounts environment variables on API error', async () => {
   const { output } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS)
     .runConfigServer(LIST_ACCOUNTS_RESPONSE_ERROR)
-  t.true(isDefinedString(output))
+  expect(isDefinedString(output)).toBe(true)
 })
 
-test('Does not set accounts environment variables on API wrong response shape', async (t) => {
+test('Does not set accounts environment variables on API wrong response shape', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS)
     .runConfigServerAsObject([LIST_ACCOUNTS_RESPONSE_WRONG_SHAPE, SITE_EXTENSIONS_EMPTY_RESPONSE])
-  t.is(TEST, undefined)
+  expect(TEST).toBe(undefined)
 })
 
-test('Does not set accounts environment variables in the buildbot', async (t) => {
+test('Does not set accounts environment variables in the buildbot', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS_BUILDBOT)
     .runConfigServerAsObject([LIST_ACCOUNTS_RESPONSE_SUCCESS, SITE_EXTENSIONS_EMPTY_RESPONSE])
-  t.is(TEST, undefined)
+  expect(TEST).toBe(undefined)
 })
 
-test('Does not set accounts environment variables if offline', async (t) => {
+test('Does not set accounts environment variables if offline', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS_OFFLINE)
     .runConfigServerAsObject(LIST_ACCOUNTS_RESPONSE_SUCCESS)
-  t.is(TEST, undefined)
+  expect(TEST).toBe(undefined)
 })
 
-test('Does not set accounts environment variables without a siteId', async (t) => {
+test('Does not set accounts environment variables without a siteId', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS_NO_SITE_ID)
     .runConfigServerAsObject(LIST_ACCOUNTS_RESPONSE_SUCCESS)
-  t.is(TEST, undefined)
+  expect(TEST).toBe(undefined)
 })
 
-test('Does not set accounts environment variables without a token', async (t) => {
+test('Does not set accounts environment variables without a token', async () => {
   const {
     env: { TEST },
   } = await new Fixture('./fixtures/empty')
     .withFlags(AUTH_FLAGS_NO_TOKEN)
     .runConfigServerAsObject(LIST_ACCOUNTS_RESPONSE_SUCCESS)
-  t.is(TEST, undefined)
+  expect(TEST).toBe(undefined)
 })
 
-test('Does not allow overridding readonly environment variables', async (t) => {
+test('Does not allow overridding readonly environment variables', async () => {
   const {
     env: { REVIEW_ID },
   } = await new Fixture('./fixtures/readonly').runWithConfigAsObject()
-  t.is(REVIEW_ID, undefined)
+  expect(REVIEW_ID).toBe(undefined)
 })

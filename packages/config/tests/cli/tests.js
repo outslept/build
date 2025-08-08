@@ -3,96 +3,96 @@ import { normalize } from 'path'
 import { fileURLToPath } from 'url'
 
 import { Fixture, normalizeOutput } from '@netlify/testing'
-import test from 'ava'
 import isCI from 'is-ci'
 import { tmpName as getTmpName } from 'tmp-promise'
+import { test, expect } from 'vitest'
 
 const INVALID_CONFIG_PATH = fileURLToPath(new URL('invalid', import.meta.url))
 const FIXTURES_DIR = fileURLToPath(new URL('fixtures', import.meta.url))
 
-test('--help', async (t) => {
+test('--help', async () => {
   const { output } = await new Fixture().withFlags({ help: true }).runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('--version', async (t) => {
+test('--version', async () => {
   const { output } = await new Fixture().withFlags({ version: true }).runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Success', async (t) => {
+test('Success', async () => {
   const { output } = await new Fixture('./fixtures/empty').runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('User error', async (t) => {
+test('User error', async () => {
   const { output } = await new Fixture('./fixtures/empty').withFlags({ config: INVALID_CONFIG_PATH }).runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('CLI flags', async (t) => {
+test('CLI flags', async () => {
   const { output } = await new Fixture('./fixtures/empty').withFlags({ branch: 'test' }).runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Stabilitize output with the --stable flag', async (t) => {
+test('Stabilitize output with the --stable flag', async () => {
   const { output } = await new Fixture('./fixtures/empty').withFlags({ stable: true }).runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Does not stabilitize output without the --stable flag', async (t) => {
+test('Does not stabilitize output without the --stable flag', async () => {
   const { output } = await new Fixture('./fixtures/empty').withFlags({ stable: false }).runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Write on file with the --output flag', async (t) => {
+test('Write on file with the --output flag', async () => {
   const output = await getTmpName({ dir: 'netlify-build-test' })
   try {
     await new Fixture('./fixtures/empty').withFlags({ output }).runConfigBinary()
     const content = await readFile(output)
     const { context } = JSON.parse(content)
-    t.is(context, 'production')
+    expect(context).toBe('production')
   } finally {
     await rm(output, { force: true, recursive: true, maxRetries: 10 })
   }
 })
 
-test('Do not write on stdout with the --output flag', async (t) => {
+test('Do not write on stdout with the --output flag', async () => {
   const output = await getTmpName({ dir: 'netlify-build-test' })
   try {
     const result = await new Fixture('./fixtures/empty').withFlags({ output }).runConfigBinary()
-    t.is(result.output, '')
+    expect(result.output).toBe('')
   } finally {
     await rm(output, { force: true, recursive: true, maxRetries: 10 })
   }
 })
 
-test('Write on stdout with the --output=- flag', async (t) => {
+test('Write on stdout with the --output=- flag', async () => {
   const { output } = await new Fixture('./fixtures/empty').withFlags({ output: '-' }).runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Ignores nonspecified config', async (t) => {
+test('Ignores nonspecified config', async () => {
   const { output } = await new Fixture().withFlags({ cwd: `${FIXTURES_DIR}/toml` }).runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Ignores empty config', async (t) => {
+test('Ignores empty config', async () => {
   const { output } = await new Fixture('./fixtures/toml').withFlags({ config: '' }).runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
-test('Check --config for toml', async (t) => {
+test('Check --config for toml', async () => {
   const { output } = await new Fixture('./fixtures/toml')
     .withFlags({ cwd: `${FIXTURES_DIR}/toml`, config: `apps/nested/netlify.toml` })
     .runConfigBinary()
-  t.snapshot(normalizeOutput(output))
+  expect(normalizeOutput(output)).toMatchSnapshot()
 })
 
 // This test is too slow in local development
 if (isCI) {
-  test('Handles big outputs', async (t) => {
-    const fixturesDir = normalize(`${fileURLToPath(test.meta.file)}/../fixtures`)
+  test('Handles big outputs', async () => {
+    const fixturesDir = normalize(`${fileURLToPath(import.meta.url)}/../fixtures`)
     const bigNetlify = `${fixturesDir}/big/netlify.toml`
 
     await rm(bigNetlify, { force: true, recursive: true, maxRetries: 10 })
@@ -100,9 +100,9 @@ if (isCI) {
       const bigContent = getBigNetlifyContent()
       await writeFile(bigNetlify, bigContent)
       const { output } = await new Fixture('./fixtures/big').withFlags({ output: '-' }).runConfigBinary()
-      t.notThrows(() => {
+      expect(() => {
         JSON.parse(output)
-      })
+      }).not.toThrow()
     } finally {
       await rm(bigNetlify, { force: true, recursive: true, maxRetries: 10 })
     }

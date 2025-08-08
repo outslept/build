@@ -21,9 +21,9 @@
   "scripts": {
     "prebuild": "rm -rf lib",
     "build": "tsc",
-    "test": "ava",
-    "test:dev": "ava -w",
-    "test:ci": "c8 -r lcovonly -r text -r json ava"
+    "test": "vitest run",
+    "test:dev": "vitest",
+    "test:ci": "vitest run --reporter=default"
   },
   "keywords": [
     "javascript",
@@ -86,12 +86,11 @@
   },
   "devDependencies": {
     "@types/node": "^18.19.111",
-    "ava": "^5.0.0",
-    "c8": "^10.0.0",
     "has-ansi": "^6.0.0",
     "is-ci": "^4.0.0",
     "tmp-promise": "^3.0.2",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^3.2.4"
   },
   "engines": {
     "node": ">=18.14.0"

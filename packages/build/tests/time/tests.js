@@ -2,12 +2,12 @@ import dns from 'dns'
 
 import { intercept, cleanAll } from '@netlify/nock-udp'
 import { Fixture } from '@netlify/testing'
-import test from 'ava'
 import { spyOn } from 'tinyspy'
+import { test, expect, beforeAll, afterAll } from 'vitest'
 
 let dnsLookupSpy
 
-test.before(() => {
+beforeAll(() => {
   const origLookup = dns.lookup
   // we have to stub dns lookup as hot-shots is caching dns and therefore calling dns.lookup directly
   dnsLookupSpy = spyOn(dns, 'lookup', (host, options, cb = options) => {
@@ -22,87 +22,108 @@ test.before(() => {
   })
 })
 
-test.after(() => {
+afterAll(() => {
   dnsLookupSpy.restore()
   cleanAll()
 })
 
-test('Does not send plugin timings if no plugins', async (t) => {
-  t.snapshot(await getTimerRequestsString(t, './fixtures/simple'))
+test('Does not send plugin timings if no plugins', async () => {
+  expect(
+    await getTimerRequestsString('Does not send plugin timings if no plugins', './fixtures/simple'),
+  ).toMatchSnapshot()
 })
 
-test('Sends timings of Netlify maintained plugins', async (t) => {
-  t.snapshot(await getTimerRequestsString(t, './fixtures/system_plugin'))
+test('Sends timings of Netlify maintained plugins', async () => {
+  expect(
+    await getTimerRequestsString('Sends timings of Netlify maintained plugins', './fixtures/system_plugin'),
+  ).toMatchSnapshot()
 })
 
-test('Does not send timings of community plugins', async (t) => {
-  t.snapshot(await getTimerRequestsString(t, './fixtures/community_plugin'))
+test('Does not send timings of community plugins', async () => {
+  expect(
+    await getTimerRequestsString('Does not send timings of community plugins', './fixtures/community_plugin'),
+  ).toMatchSnapshot()
 })
 
-test('Sends timing for functions bundling', async (t) => {
-  t.snapshot(await getTimerRequestsString(t, './fixtures/functions_zisi'))
+test('Sends timing for functions bundling', async () => {
+  expect(
+    await getTimerRequestsString('Sends timing for functions bundling', './fixtures/functions_zisi'),
+  ).toMatchSnapshot()
 })
 
-test('Sends timing for edge functions bundling', async (t) => {
-  t.snapshot(await getTimerRequestsString(t, './fixtures/edge_functions'))
+test('Sends timing for edge functions bundling', async () => {
+  expect(
+    await getTimerRequestsString('Sends timing for edge functions bundling', './fixtures/edge_functions'),
+  ).toMatchSnapshot()
 })
 
-test('Sends distribution metrics', async (t) => {
-  const timerRequests = await getAllTimerRequests(t, './fixtures/simple')
+test('Sends distribution metrics', async () => {
+  const timerRequests = await getAllTimerRequests('Sends distribution metrics', './fixtures/simple')
   const includesDistributionRequests = timerRequests.some((timerRequest) => timerRequest.includes('|d|'))
 
-  t.true(includesDistributionRequests)
+  expect(includesDistributionRequests).toBe(true)
 })
 
-test('Allow passing --framework CLI flag', async (t) => {
-  const timerRequests = await getAllTimerRequests(t, './fixtures/simple', { framework: 'test' })
-  t.true(timerRequests.every((timerRequest) => timerRequest.includes('framework:test')))
+test('Allow passing --framework CLI flag', async () => {
+  const timerRequests = await getAllTimerRequests('Allow passing --framework CLI flag', './fixtures/simple', {
+    framework: 'test',
+  })
+  expect(timerRequests.every((timerRequest) => timerRequest.includes('framework:test'))).toBe(true)
 })
 
-test('Default --framework CLI flag to nothing', async (t) => {
-  const timerRequests = await getAllTimerRequests(t, './fixtures/simple')
-  t.true(timerRequests.every((timerRequest) => !timerRequest.includes('framework:')))
+test('Default --framework CLI flag to nothing', async () => {
+  const timerRequests = await getAllTimerRequests('Default --framework CLI flag to nothing', './fixtures/simple')
+  expect(timerRequests.every((timerRequest) => !timerRequest.includes('framework:'))).toBe(true)
 })
 
-test('Sends a `bundler: "zisi"` tag when bundler set to zisi', async (t) => {
-  const timerRequests = await getAllTimerRequests(t, './fixtures/functions_zisi')
+test('Sends a `bundler: "zisi"` tag when bundler set to zisi', async () => {
+  const timerRequests = await getAllTimerRequests(
+    'Sends a `bundler: "zisi"` tag when bundler set to zisi',
+    './fixtures/functions_zisi',
+  )
   const functionsBundlingRequest = timerRequests.find((timerRequest) =>
     timerRequest.includes('stage:functions_bundling'),
   )
 
-  t.true(functionsBundlingRequest.includes('bundler:zisi'))
-  t.false(functionsBundlingRequest.includes('bundler:zisi,bundler:zisi'))
+  expect(functionsBundlingRequest.includes('bundler:zisi')).toBe(true)
+  expect(functionsBundlingRequest.includes('bundler:zisi,bundler:zisi')).toBe(false)
 })
 
-test('Sends a `bundler: "nft"` tag when bundler set to nft', async (t) => {
-  const timerRequests = await getAllTimerRequests(t, './fixtures/functions_nft')
+test('Sends a `bundler: "nft"` tag when bundler set to nft', async () => {
+  const timerRequests = await getAllTimerRequests(
+    'Sends a `bundler: "nft"` tag when bundler set to nft',
+    './fixtures/functions_nft',
+  )
   const functionsBundlingRequest = timerRequests.find((timerRequest) =>
     timerRequest.includes('stage:functions_bundling'),
   )
 
-  t.true(functionsBundlingRequest.includes('bundler:nft'))
-  t.false(functionsBundlingRequest.includes('bundler:nft,bundler:nft'))
+  expect(functionsBundlingRequest.includes('bundler:nft')).toBe(true)
+  expect(functionsBundlingRequest.includes('bundler:nft,bundler:nft')).toBe(false)
 })
 
-test('Sends a `bundler: "esbuild"` tag when at least one function uses the esbuild bundler', async (t) => {
-  const timerRequests = await getAllTimerRequests(t, './fixtures/functions_esbuild')
+test('Sends a `bundler: "esbuild"` tag when at least one function uses the esbuild bundler', async () => {
+  const timerRequests = await getAllTimerRequests(
+    'Sends a `bundler: "esbuild"` tag when at least one function uses the esbuild bundler',
+    './fixtures/functions_esbuild',
+  )
   const functionsBundlingRequest = timerRequests.find((timerRequest) =>
     timerRequest.includes('stage:functions_bundling'),
   )
 
-  t.true(functionsBundlingRequest.includes('bundler:nft,bundler:esbuild'))
+  expect(functionsBundlingRequest.includes('bundler:nft,bundler:esbuild')).toBe(true)
 })
 
 // Retrieve statsd packets sent to --statsd.host|port, and get their snapshot
-const getTimerRequestsString = async function (t, fixtureName, flags) {
-  const timerRequests = await getAllTimerRequests(t, fixtureName, flags)
+const getTimerRequestsString = async function (testTitle, fixtureName, flags) {
+  const timerRequests = await getAllTimerRequests(testTitle, fixtureName, flags)
   const timerRequestsString = serializeTimerRequests(timerRequests)
   return timerRequestsString
 }
 
-const getAllTimerRequests = async function (t, fixtureName, flags = {}) {
+const getAllTimerRequests = async function (testTitle, fixtureName, flags = {}) {
   // Ensure there's no conflict between each test scope
-  const host = `timetest.${encodeURI(t.title)}`
+  const host = `timetest.${encodeURI(testTitle)}`
   const port = '1234'
   const scope = intercept(`${host}:${port}`, { persist: true, allowUnknown: true })
 
@@ -111,7 +132,7 @@ const getAllTimerRequests = async function (t, fixtureName, flags = {}) {
   await new Fixture(fixtureName).withFlags({ statsd: { host, port }, ...flags }).runWithBuild()
 
   const timerRequests = scope.buffers.flatMap(flattenRequest)
-  t.true(scope.used)
+  expect(scope.used).toBe(true)
   scope.clean()
   return timerRequests
 }
